@@ -1,0 +1,52 @@
+project:
+  name: industrial-defect-inference-service
+  seed: 42
+
+dataset:
+  name: Severstal Steel Defect Detection
+  task: semantic_segmentation
+  expected_images: 12568
+  expected_annotation_rows: 50272
+  expected_image_size: [1600, 256]
+  splits: [train, val, test]
+  split_ratio: [0.7, 0.15, 0.15]
+  classes:
+    - defect_1
+    - defect_2
+    - defect_3
+    - defect_4
+
+training:
+  model: unet_resnet18
+  image_size: [1024, 256]
+  epochs: 60
+  batch: auto
+  patience: 10
+  loss:
+    - binary_cross_entropy
+    - dice
+
+evaluation:
+  primary_metric: macro_dice
+  quality_metrics:
+    - per_class_dice
+    - macro_dice
+    - per_class_iou
+    - macro_iou
+    - precision
+    - recall
+    - image_false_negative_rate
+  deployment_metrics:
+    - mean_latency_ms
+    - p50_latency_ms
+    - p95_latency_ms
+    - p99_latency_ms
+    - throughput_fps
+    - gpu_memory_mb
+    - model_size_mb
+
+serving:
+  max_batch_size: 8
+  preferred_batch_sizes: [2, 4, 8]
+  max_queue_delay_microseconds: 1000
+  request_timeout_seconds: 5
