@@ -1,0 +1,62 @@
+{
+  "annotation_sha256": "653e98583cdcacc71c74924e40baa6edd24b3710581742c1ddfddc0037c41c4e",
+  "class_positive_images": {
+    "defect_1": 897,
+    "defect_2": 247,
+    "defect_3": 5150,
+    "defect_4": 801
+  },
+  "label_set_distribution": {
+    "0000": 5902,
+    "0001": 516,
+    "0010": 4759,
+    "0011": 284,
+    "0100": 195,
+    "0101": 1,
+    "0110": 14,
+    "1000": 769,
+    "1010": 91,
+    "1100": 35,
+    "1110": 2
+  },
+  "manifest_sha256": "eb514d4492b4d6260ce0bfa4673597b48202b675ea2c0a7c86c2962e5c6fed90",
+  "normal_images": 5902,
+  "per_split_class_positive_images": {
+    "test": {
+      "defect_1": 134,
+      "defect_2": 36,
+      "defect_3": 772,
+      "defect_4": 120
+    },
+    "train": {
+      "defect_1": 629,
+      "defect_2": 175,
+      "defect_3": 3606,
+      "defect_4": 561
+    },
+    "val": {
+      "defect_1": 134,
+      "defect_2": 36,
+      "defect_3": 772,
+      "defect_4": 120
+    }
+  },
+  "positive_images": 6666,
+  "seed": 42,
+  "split_positive_images": {
+    "test": 999,
+    "train": 4668,
+    "val": 999
+  },
+  "split_ratio": {
+    "test": 0.15,
+    "train": 0.7,
+    "val": 0.15
+  },
+  "split_sizes": {
+    "test": 1885,
+    "train": 8798,
+    "val": 1885
+  },
+  "total_images": 12568
+}

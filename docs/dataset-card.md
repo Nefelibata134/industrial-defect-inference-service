@@ -14,8 +14,22 @@
 - Image resolution: 1600 x 256 pixels.
 - Four anonymized defect classes.
 - Pixel masks stored as run-length encoded start-length pairs.
+- The current Kaggle export uses a sparse annotation table: only positive
+  image-class masks are listed, and absent images are normal samples.
 - One image can contain no defect, one class, or multiple classes.
 - Class labels and positive pixels are strongly imbalanced.
+
+Validated aggregate statistics:
+
+| Item | Count |
+| --- | ---: |
+| Annotation rows / positive masks | 7,095 |
+| Images referenced by positive annotations | 6,666 |
+| Normal images inferred from the image directory | 5,902 |
+| `defect_1` masks | 897 |
+| `defect_2` masks | 247 |
+| `defect_3` masks | 5,150 |
+| `defect_4` masks | 801 |
 
 The original competition test set does not provide public ground truth, so the
 versioned train/validation/test manifests are generated from the labeled
@@ -39,19 +53,21 @@ postprocessing, and API responses.
 - Validation: 15%.
 - Test: 15%.
 - Seed: 42.
-- Strategy: iterative multilabel stratification over the four positive-class
-  indicators plus the no-defect indicator.
+- Strategy: deterministic label-powerset stratification over the four
+  positive-class indicators, including the all-zero normal signature.
 - Leakage control: each source image appears in exactly one split.
 
-Generated manifests contain relative paths, class indicators, source file
-size, and SHA256. The test manifest is not used for threshold selection.
+The generated manifest contains image identifiers, split assignment, a
+no-defect/defect indicator, and four class indicators. The report records the
+annotation and manifest SHA256 values. The test split is not used for
+threshold selection.
 
 ## Validation Gates
 
 The raw dataset is rejected when:
 
 - required CSV columns are absent;
-- an image or annotation row is missing;
+- a referenced image is missing;
 - class identifiers fall outside 1 through 4;
 - an RLE sequence is malformed;
 - expected image or annotation counts change;

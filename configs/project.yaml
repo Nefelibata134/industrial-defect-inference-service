@@ -6,7 +6,7 @@ dataset:
   name: Severstal Steel Defect Detection
   task: semantic_segmentation
   expected_images: 12568
-  expected_annotation_rows: 50272
+  expected_annotation_rows: 7095
   expected_image_size: [1600, 256]
   splits: [train, val, test]
   split_ratio: [0.7, 0.15, 0.15]

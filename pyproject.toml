@@ -16,6 +16,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+data = [
+    "kaggle>=1.7.4,<2",
+]
 train = [
     "albumentations>=2,<3",
     "pandas>=2.2,<3",

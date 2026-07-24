@@ -13,5 +13,5 @@ def test_project_config_contract() -> None:
     assert config.dataset.task == "semantic_segmentation"
     assert config.dataset.splits == ("train", "val", "test")
     assert len(config.dataset.classes) == 4
-    assert config.dataset.expected_annotation_rows == 50272
+    assert config.dataset.expected_annotation_rows == 7095
     assert sum(config.dataset.split_ratio) == 1.0

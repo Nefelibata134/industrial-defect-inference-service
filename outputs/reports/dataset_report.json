@@ -1,0 +1,25 @@
+{
+  "root": "data/raw/severstal",
+  "annotation_format": "sparse",
+  "annotation_rows": 7095,
+  "images_in_csv": 6666,
+  "images_on_disk": 12568,
+  "positive_masks": 7095,
+  "normal_images": 5902,
+  "class_masks": {
+    "defect_1": 897,
+    "defect_2": 247,
+    "defect_3": 5150,
+    "defect_4": 801
+  },
+  "missing_images": [],
+  "unexpected_images": [],
+  "image_sizes": {
+    "1600x256": 12568
+  },
+  "unreadable_images": [],
+  "unexpected_dimensions": [],
+  "invalid_rows": [],
+  "valid": true,
+  "errors": []
+}

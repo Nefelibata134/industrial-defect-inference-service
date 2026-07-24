@@ -48,6 +48,16 @@ Kaggle competition terms and validated with the repository tooling. See
 [`docs/dataset-card.md`](docs/dataset-card.md) and
 [`docs/adr/0001-dataset-and-task.md`](docs/adr/0001-dataset-and-task.md).
 
+Validated source statistics:
+
+| Item | Count |
+| --- | ---: |
+| Training images | 12,568 |
+| Images with at least one defect | 6,666 |
+| Normal images | 5,902 |
+| Positive masks | 7,095 |
+| Class 1 / 2 / 3 / 4 masks | 897 / 247 / 5,150 / 801 |
+
 ## Architecture
 
 ```text
@@ -103,7 +113,7 @@ cd industrial-defect-inference-service
 conda create -n defect310 python=3.10 -y
 conda activate defect310
 python -m pip install --upgrade pip
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[data,dev]"
 
 ruff check .
 pytest -q
@@ -111,7 +121,13 @@ python scripts/check_environment.py
 ```
 
 GPU framework packages are installed separately so their CUDA and TensorRT
-versions match the host runtime.
+versions match the host runtime. After accepting the competition rules,
+configure the Kaggle CLI credentials in its standard user configuration path
+and run:
+
+```bash
+python scripts/download_dataset.py
+```
 
 Place the Kaggle files locally:
 
@@ -129,8 +145,18 @@ Validate the raw dataset before generating split manifests:
 python scripts/inspect_dataset.py \
   --config configs/project.yaml \
   --data-root data/raw/severstal \
-  --output outputs/dataset_report.json
+  --output outputs/reports/dataset_report.json
+
+python scripts/build_manifest.py \
+  --output data/manifests/severstal_v1.csv \
+  --summary outputs/reports/split_summary.json
+
+python scripts/visualize_masks.py --count 4
 ```
+
+The split is deterministic with seed `42` and contains 8,798 training, 1,885
+validation, and 1,885 test images. Aggregate validation and split reports are
+versioned; raw data and rendered source-image samples remain local.
 
 ## Repository Layout
 

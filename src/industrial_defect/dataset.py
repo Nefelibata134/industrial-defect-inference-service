@@ -5,12 +5,15 @@ from collections import Counter, defaultdict
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+import cv2
+
 from industrial_defect.config import DatasetConfig
 
 
 @dataclass
 class DatasetReport:
     root: str
+    annotation_format: str
     annotation_rows: int
     images_in_csv: int
     images_on_disk: int
@@ -19,6 +22,9 @@ class DatasetReport:
     class_masks: dict[str, int]
     missing_images: list[str]
     unexpected_images: list[str]
+    image_sizes: dict[str, int]
+    unreadable_images: list[str]
+    unexpected_dimensions: list[str]
     invalid_rows: list[str]
     valid: bool
     errors: list[str]
@@ -27,9 +33,7 @@ class DatasetReport:
         return asdict(self)
 
 
-def _parse_annotation_row(
-    row: dict[str, str], line_number: int
-) -> tuple[str, int, str] | str:
+def _parse_annotation_row(row: dict[str, str], line_number: int) -> tuple[str, int, str] | str:
     if "ImageId_ClassId" in row:
         combined = (row.get("ImageId_ClassId") or "").strip()
         try:
@@ -72,7 +76,8 @@ def _validate_rle(encoded_pixels: str, line_number: int) -> str | None:
 
 
 def inspect_severstal_dataset(root: str | Path, config: DatasetConfig) -> DatasetReport:
-    dataset_root = Path(root).expanduser().resolve()
+    requested_root = Path(root).expanduser()
+    dataset_root = requested_root.resolve()
     csv_path = dataset_root / "train.csv"
     images_dir = dataset_root / "train_images"
     errors: list[str] = []
@@ -87,7 +92,8 @@ def inspect_severstal_dataset(root: str | Path, config: DatasetConfig) -> Datase
 
     if errors:
         return DatasetReport(
-            root=str(dataset_root),
+            root=str(requested_root),
+            annotation_format="unknown",
             annotation_rows=0,
             images_in_csv=0,
             images_on_disk=0,
@@ -96,6 +102,9 @@ def inspect_severstal_dataset(root: str | Path, config: DatasetConfig) -> Datase
             class_masks={},
             missing_images=[],
             unexpected_images=[],
+            image_sizes={},
+            unreadable_images=[],
+            unexpected_dimensions=[],
             invalid_rows=[],
             valid=False,
             errors=errors,
@@ -105,6 +114,7 @@ def inspect_severstal_dataset(root: str | Path, config: DatasetConfig) -> Datase
     positive_classes: defaultdict[str, set[int]] = defaultdict(set)
     csv_images: set[str] = set()
     annotation_rows = 0
+    has_empty_annotations = False
 
     with csv_path.open(encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle)
@@ -126,6 +136,7 @@ def inspect_severstal_dataset(root: str | Path, config: DatasetConfig) -> Datase
 
                 image_id, class_id, encoded_pixels = parsed
                 csv_images.add(image_id)
+                has_empty_annotations = has_empty_annotations or not encoded_pixels
                 if not 1 <= class_id <= len(config.classes):
                     invalid_rows.append(
                         f"train.csv:{line_number}: class id {class_id} is out of range"
@@ -147,33 +158,53 @@ def inspect_severstal_dataset(root: str | Path, config: DatasetConfig) -> Datase
         for path in images_dir.iterdir()
         if path.is_file() and path.suffix.lower() in {".jpeg", ".jpg", ".png"}
     }
+    annotation_format = "dense" if has_empty_annotations else "sparse"
     missing_images = sorted(csv_images - disk_images)
-    unexpected_images = sorted(disk_images - csv_images)
+    unexpected_images = sorted(disk_images - csv_images) if annotation_format == "dense" else []
     positive_masks = sum(class_masks.values())
-    normal_images = len(csv_images) - len(positive_classes)
+    normal_images = len(disk_images) - len(positive_classes)
+    image_sizes: Counter[str] = Counter()
+    unreadable_images: list[str] = []
+    unexpected_dimensions: list[str] = []
+
+    for image_id in sorted(disk_images):
+        image = cv2.imread(str(images_dir / image_id), cv2.IMREAD_UNCHANGED)
+        if image is None:
+            unreadable_images.append(image_id)
+            continue
+
+        height, width = image.shape[:2]
+        image_sizes[f"{width}x{height}"] += 1
+        if (width, height) != config.expected_image_size:
+            unexpected_dimensions.append(f"{image_id}: {width}x{height}")
 
     if annotation_rows != config.expected_annotation_rows:
         errors.append(
-            f"expected {config.expected_annotation_rows} annotation rows, "
-            f"found {annotation_rows}"
+            f"expected {config.expected_annotation_rows} annotation rows, found {annotation_rows}"
         )
-    if len(csv_images) != config.expected_images:
+    if annotation_format == "dense" and len(csv_images) != config.expected_images:
         errors.append(
             f"expected {config.expected_images} images in train.csv, found {len(csv_images)}"
         )
     if len(disk_images) != config.expected_images:
-        errors.append(
-            f"expected {config.expected_images} image files, found {len(disk_images)}"
-        )
+        errors.append(f"expected {config.expected_images} image files, found {len(disk_images)}")
     if missing_images:
         errors.append(f"{len(missing_images)} CSV images are missing on disk")
     if unexpected_images:
         errors.append(f"{len(unexpected_images)} image files are absent from train.csv")
+    if unreadable_images:
+        errors.append(f"{len(unreadable_images)} image files cannot be decoded")
+    if unexpected_dimensions:
+        expected_width, expected_height = config.expected_image_size
+        errors.append(
+            f"{len(unexpected_dimensions)} images do not match {expected_width}x{expected_height}"
+        )
     if invalid_rows:
         errors.append(f"{len(invalid_rows)} annotation rows are invalid")
 
     return DatasetReport(
-        root=str(dataset_root),
+        root=str(requested_root),
+        annotation_format=annotation_format,
         annotation_rows=annotation_rows,
         images_in_csv=len(csv_images),
         images_on_disk=len(disk_images),
@@ -182,6 +213,9 @@ def inspect_severstal_dataset(root: str | Path, config: DatasetConfig) -> Datase
         class_masks=dict(sorted(class_masks.items())),
         missing_images=missing_images,
         unexpected_images=unexpected_images,
+        image_sizes=dict(sorted(image_sizes.items())),
+        unreadable_images=unreadable_images,
+        unexpected_dimensions=unexpected_dimensions,
         invalid_rows=invalid_rows,
         valid=not errors,
         errors=errors,

@@ -8,10 +8,14 @@ __pycache__/
 
 data/*
 !data/.gitkeep
+!data/manifests/
+!data/manifests/*.csv
 models/*
 !models/.gitkeep
 outputs/*
 !outputs/.gitkeep
+!outputs/reports/
+!outputs/reports/*.json
 runs/
 
 *.engine
