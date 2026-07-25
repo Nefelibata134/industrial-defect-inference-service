@@ -15,7 +15,9 @@ models/*
 outputs/*
 !outputs/.gitkeep
 !outputs/reports/
-!outputs/reports/*.json
+outputs/reports/*
+!outputs/reports/dataset_report.json
+!outputs/reports/split_summary.json
 runs/
 
 *.engine

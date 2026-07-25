@@ -180,6 +180,14 @@ python scripts/train.py --device cuda
 python scripts/plot_training_history.py
 ```
 
+Sweep validation thresholds before changing the model or loss:
+
+```bash
+python scripts/evaluate_thresholds.py \
+  --device cuda \
+  --checkpoint models/best_unet_resnet18.pt
+```
+
 Resume an interrupted run from the latest completed epoch:
 
 ```bash
