@@ -180,9 +180,18 @@ python scripts/train.py --device cuda
 python scripts/plot_training_history.py
 ```
 
-The best resumable checkpoint is written under `models/`, while structured
-epoch history and rendered curves are written under `outputs/reports/`. These
-generated artifacts are excluded from source control and summarized in a
+Resume an interrupted run from the latest completed epoch:
+
+```bash
+python scripts/train.py \
+  --device cuda \
+  --resume models/latest_unet_resnet18.pt
+```
+
+The best checkpoint for model selection and the latest checkpoint for
+interruption recovery are written under `models/`. Structured epoch history
+and rendered curves are written under `outputs/reports/`. These generated
+artifacts are excluded from source control and summarized in a
 versioned quality report after the experiment is reproduced.
 
 ## Repository Layout

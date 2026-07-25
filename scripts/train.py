@@ -30,6 +30,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--pretrained", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
     parser.add_argument("--checkpoint", default="models/best_unet_resnet18.pt")
+    parser.add_argument("--latest-checkpoint", default="models/latest_unet_resnet18.pt")
+    parser.add_argument("--resume", help="Resume from a latest training checkpoint.")
     parser.add_argument("--history", default="outputs/reports/training_history.json")
     return parser.parse_args()
 
@@ -136,8 +138,23 @@ def main() -> None:
     history: list[dict[str, object]] = []
     best_dice = -1.0
     epochs_without_improvement = 0
+    start_epoch = 1
     checkpoint_path = Path(args.checkpoint)
+    latest_checkpoint_path = Path(args.latest_checkpoint)
     history_path = Path(args.history)
+
+    if args.resume:
+        resume_path = Path(args.resume)
+        resume_state = torch.load(resume_path, map_location=device, weights_only=False)
+        model.load_state_dict(resume_state["model_state_dict"])
+        optimizer.load_state_dict(resume_state["optimizer_state_dict"])
+        scheduler.load_state_dict(resume_state["scheduler_state_dict"])
+        scaler.load_state_dict(resume_state["scaler_state_dict"])
+        history = list(resume_state["history"])
+        best_dice = float(resume_state["best_macro_dice"])
+        epochs_without_improvement = int(resume_state["epochs_without_improvement"])
+        start_epoch = int(resume_state["epoch"]) + 1
+        print("resumed from:", resume_path)
 
     print("device:", device)
     print("image size:", image_size)
@@ -145,7 +162,7 @@ def main() -> None:
     print("train/val samples:", len(train_dataset), len(val_dataset))
     print("AMP:", scaler.is_enabled())
 
-    for epoch in range(1, epochs + 1):
+    for epoch in range(start_epoch, epochs + 1):
         train_results = run_epoch(
             model=model,
             batches=train_loader,
@@ -185,18 +202,23 @@ def main() -> None:
         if improved:
             best_dice = val_dice
             epochs_without_improvement = 0
-            save_checkpoint(
-                checkpoint_path,
-                {
-                    "epoch": epoch,
-                    "best_macro_dice": best_dice,
-                    "model_state_dict": model.state_dict(),
-                    "optimizer_state_dict": optimizer.state_dict(),
-                    "config": asdict(config),
-                },
-            )
         else:
             epochs_without_improvement += 1
+
+        checkpoint_state = {
+            "epoch": epoch,
+            "best_macro_dice": best_dice,
+            "epochs_without_improvement": epochs_without_improvement,
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+            "scheduler_state_dict": scheduler.state_dict(),
+            "scaler_state_dict": scaler.state_dict(),
+            "config": asdict(config),
+            "history": history,
+        }
+        save_checkpoint(latest_checkpoint_path, checkpoint_state)
+        if improved:
+            save_checkpoint(checkpoint_path, checkpoint_state)
 
         print(
             f"epoch={epoch:03d} "
@@ -212,6 +234,7 @@ def main() -> None:
             break
 
     print("best checkpoint:", checkpoint_path)
+    print("latest checkpoint:", latest_checkpoint_path)
     print("history:", history_path)
 
 
