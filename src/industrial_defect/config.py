@@ -20,10 +20,26 @@ class DatasetConfig:
 
 
 @dataclass(frozen=True)
+class TrainingConfig:
+    model: str
+    image_size: tuple[int, int]
+    epochs: int
+    batch: int
+    learning_rate: float
+    weight_decay: float
+    num_workers: int
+    amp: bool
+    threshold: float
+    patience: int
+    loss: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class ProjectConfig:
     name: str
     seed: int
     dataset: DatasetConfig
+    training: TrainingConfig
 
 
 def _require(mapping: dict[str, Any], key: str) -> Any:
@@ -42,13 +58,17 @@ def load_project_config(path: str | Path) -> ProjectConfig:
 
     project_raw = _require(raw, "project")
     dataset_raw = _require(raw, "dataset")
-    if not isinstance(project_raw, dict) or not isinstance(dataset_raw, dict):
-        raise ValueError("project and dataset must be mappings")
+    training_raw = _require(raw, "training")
+    if not all(isinstance(section, dict) for section in (project_raw, dataset_raw, training_raw)):
+        raise ValueError("project, dataset, and training must be mappings")
 
     splits = tuple(_require(dataset_raw, "splits"))
     split_ratio = tuple(float(value) for value in _require(dataset_raw, "split_ratio"))
     classes = tuple(_require(dataset_raw, "classes"))
     image_size = tuple(int(value) for value in _require(dataset_raw, "expected_image_size"))
+    training_image_size = tuple(
+        int(value) for value in _require(training_raw, "image_size")
+    )
 
     if len(splits) != len(split_ratio):
         raise ValueError("splits and split_ratio must have the same length")
@@ -56,6 +76,8 @@ def load_project_config(path: str | Path) -> ProjectConfig:
         raise ValueError("split_ratio must sum to 1.0")
     if len(image_size) != 2:
         raise ValueError("expected_image_size must contain width and height")
+    if len(training_image_size) != 2 or any(value <= 0 for value in training_image_size):
+        raise ValueError("training.image_size must contain positive width and height")
     if not classes or len(set(classes)) != len(classes):
         raise ValueError("classes must be non-empty and unique")
 
@@ -69,8 +91,37 @@ def load_project_config(path: str | Path) -> ProjectConfig:
         split_ratio=split_ratio,
         classes=classes,
     )
+    batch = _require(training_raw, "batch")
+    if not isinstance(batch, int) or batch <= 0:
+        raise ValueError("training.batch must be a positive integer")
+
+    training = TrainingConfig(
+        model=str(_require(training_raw, "model")),
+        image_size=(training_image_size[0], training_image_size[1]),
+        epochs=int(_require(training_raw, "epochs")),
+        batch=batch,
+        learning_rate=float(_require(training_raw, "learning_rate")),
+        weight_decay=float(_require(training_raw, "weight_decay")),
+        num_workers=int(_require(training_raw, "num_workers")),
+        amp=bool(_require(training_raw, "amp")),
+        threshold=float(_require(training_raw, "threshold")),
+        patience=int(_require(training_raw, "patience")),
+        loss=tuple(str(value) for value in _require(training_raw, "loss")),
+    )
+    if training.epochs <= 0 or training.patience <= 0:
+        raise ValueError("training epochs and patience must be positive")
+    if training.learning_rate <= 0 or training.weight_decay < 0:
+        raise ValueError("training optimizer values are invalid")
+    if training.num_workers < 0:
+        raise ValueError("training.num_workers must be non-negative")
+    if not 0.0 < training.threshold < 1.0:
+        raise ValueError("training.threshold must be between 0 and 1")
+    if not training.loss:
+        raise ValueError("training.loss must be non-empty")
+
     return ProjectConfig(
         name=str(_require(project_raw, "name")),
         seed=int(_require(project_raw, "seed")),
         dataset=dataset,
+        training=training,
     )

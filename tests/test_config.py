@@ -15,3 +15,11 @@ def test_project_config_contract() -> None:
     assert len(config.dataset.classes) == 4
     assert config.dataset.expected_annotation_rows == 7095
     assert sum(config.dataset.split_ratio) == 1.0
+    assert config.training.model == "unet_resnet18"
+    assert config.training.image_size == (1024, 256)
+    assert config.training.batch == 8
+    assert config.training.learning_rate == 0.001
+    assert config.training.weight_decay == 0.0001
+    assert config.training.num_workers == 4
+    assert config.training.amp is True
+    assert config.training.threshold == 0.5

@@ -113,7 +113,7 @@ cd industrial-defect-inference-service
 conda create -n defect310 python=3.10 -y
 conda activate defect310
 python -m pip install --upgrade pip
-python -m pip install -e ".[data,dev]"
+python -m pip install -e ".[data,train,dev]"
 
 ruff check .
 pytest -q
@@ -157,6 +157,33 @@ python scripts/visualize_masks.py --count 4
 The split is deterministic with seed `42` and contains 8,798 training, 1,885
 validation, and 1,885 test images. Aggregate validation and split reports are
 versioned; raw data and rendered source-image samples remain local.
+
+## Training Baseline
+
+The baseline is a four-channel U-Net with an ImageNet-pretrained ResNet-18
+encoder. It uses BCE-with-logits plus soft Dice loss, AdamW, automatic mixed
+precision, validation macro Dice checkpoint selection, learning-rate
+reduction, and early stopping.
+
+Inspect the input contract and run a single optimization step before starting
+a full experiment:
+
+```bash
+python scripts/inspect_training_batch.py --batch-size 4
+python scripts/smoke_train_step.py --device cuda --batch-size 2
+```
+
+Start the configured baseline and render its curves:
+
+```bash
+python scripts/train.py --device cuda
+python scripts/plot_training_history.py
+```
+
+The best resumable checkpoint is written under `models/`, while structured
+epoch history and rendered curves are written under `outputs/reports/`. These
+generated artifacts are excluded from source control and summarized in a
+versioned quality report after the experiment is reproduced.
 
 ## Repository Layout
 
