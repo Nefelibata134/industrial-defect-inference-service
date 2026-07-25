@@ -4,9 +4,14 @@ from pathlib import Path
 import cv2
 import numpy as np
 import pytest
+import torch
 
 from industrial_defect.rle import encode_rle
-from industrial_defect.training_data import SeverstalSegmentationDataset, build_dataloader
+from industrial_defect.training_data import (
+    SeverstalSegmentationDataset,
+    build_dataloader,
+    compute_class_aware_sample_weights,
+)
 
 
 def write_training_fixture(root: Path) -> tuple[Path, Path]:
@@ -124,3 +129,29 @@ def test_dataloader_rejects_invalid_batch_size(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="batch_size"):
         build_dataloader(dataset, batch_size=0, shuffle=False)
+
+
+def test_class_aware_weights_prioritize_rare_classes() -> None:
+    label_matrix = torch.tensor(
+        [
+            [1, 0],
+            [0, 1],
+            [0, 1],
+            [0, 1],
+            [0, 0],
+        ],
+        dtype=torch.bool,
+    )
+
+    weights = compute_class_aware_sample_weights(label_matrix, power=0.5)
+
+    assert weights.mean().item() == pytest.approx(1.0)
+    assert weights[0] > weights[1]
+    assert weights[4] > weights[1]
+
+
+def test_class_aware_weights_reject_invalid_power() -> None:
+    label_matrix = torch.tensor([[1, 0]], dtype=torch.bool)
+
+    with pytest.raises(ValueError, match="power"):
+        compute_class_aware_sample_weights(label_matrix, power=1.5)

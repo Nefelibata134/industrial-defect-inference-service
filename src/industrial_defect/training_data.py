@@ -10,7 +10,7 @@ import cv2
 import numpy as np
 import torch
 from numpy.typing import NDArray
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, Sampler
 
 from industrial_defect.rle import decode_rle
 
@@ -110,6 +110,19 @@ class SeverstalSegmentationDataset(Dataset[SegmentationSample]):
         self.class_count = class_count
         self.image_size = image_size
         self.transform = transform
+        self.label_matrix = torch.tensor(
+            [
+                [
+                    bool(encoded_pixels)
+                    for encoded_pixels in self.annotations.get(
+                        image_id,
+                        ("",) * self.class_count,
+                    )
+                ]
+                for image_id in self.image_ids
+            ],
+            dtype=torch.bool,
+        )
 
         if len(image_size) != 2 or any(value <= 0 for value in image_size):
             raise ValueError("image_size must contain positive width and height")
@@ -168,11 +181,49 @@ class SeverstalSegmentationDataset(Dataset[SegmentationSample]):
         return {"image": image_tensor, "mask": mask_tensor, "image_id": image_id}
 
 
+def compute_class_aware_sample_weights(
+    label_matrix: torch.Tensor,
+    *,
+    power: float = 0.5,
+) -> torch.Tensor:
+    if label_matrix.ndim != 2 or label_matrix.shape[0] == 0:
+        raise ValueError("label_matrix must have shape samples x classes")
+    if not 0.0 <= power <= 1.0:
+        raise ValueError("sampling power must be between 0 and 1")
+
+    presence = label_matrix.to(dtype=torch.bool, device="cpu")
+    sample_count = presence.shape[0]
+    class_counts = presence.sum(dim=0).to(torch.float64)
+    class_factors = torch.where(
+        class_counts > 0,
+        (sample_count / class_counts.clamp_min(1.0)).pow(power),
+        torch.zeros_like(class_counts),
+    )
+
+    positive_weights = (
+        presence.to(torch.float64) * class_factors.unsqueeze(0)
+    ).max(dim=1).values
+    normal_mask = ~presence.any(dim=1)
+    normal_count = int(normal_mask.sum().item())
+    normal_factor = (
+        (sample_count / normal_count) ** power if normal_count > 0 else 0.0
+    )
+    sample_weights = torch.where(
+        normal_mask,
+        torch.full_like(positive_weights, normal_factor),
+        positive_weights,
+    )
+    if torch.any(sample_weights <= 0):
+        raise ValueError("every sample must have a positive sampling weight")
+    return sample_weights / sample_weights.mean()
+
+
 def build_dataloader(
     dataset: Dataset[SegmentationSample],
     *,
     batch_size: int,
     shuffle: bool,
+    sampler: Sampler[int] | None = None,
     num_workers: int = 0,
     pin_memory: bool = False,
     drop_last: bool = False,
@@ -182,6 +233,8 @@ def build_dataloader(
         raise ValueError("batch_size must be positive")
     if num_workers < 0:
         raise ValueError("num_workers must be non-negative")
+    if shuffle and sampler is not None:
+        raise ValueError("shuffle and sampler cannot both be enabled")
 
     generator = torch.Generator()
     generator.manual_seed(seed)
@@ -189,6 +242,7 @@ def build_dataloader(
         dataset,
         batch_size=batch_size,
         shuffle=shuffle,
+        sampler=sampler,
         num_workers=num_workers,
         pin_memory=pin_memory,
         drop_last=drop_last,

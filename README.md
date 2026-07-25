@@ -188,6 +188,20 @@ python scripts/evaluate_thresholds.py \
   --checkpoint models/best_unet_resnet18.pt
 ```
 
+Run the class-aware sampling experiment while keeping the baseline loss and
+model unchanged:
+
+```bash
+python scripts/train.py \
+  --device cuda \
+  --epochs 5 \
+  --sampler class-aware \
+  --sampling-power 0.5 \
+  --checkpoint models/class_aware_e05_best_unet_resnet18.pt \
+  --latest-checkpoint models/class_aware_e05_latest_unet_resnet18.pt \
+  --history outputs/reports/class_aware_e05_training_history.json
+```
+
 Resume an interrupted run from the latest completed epoch:
 
 ```bash

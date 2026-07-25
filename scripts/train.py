@@ -8,12 +8,17 @@ from pathlib import Path
 
 import numpy as np
 import torch
+from torch.utils.data import WeightedRandomSampler
 
 from industrial_defect.config import load_project_config
 from industrial_defect.loss import BCEDiceLoss
 from industrial_defect.model import build_segmentation_model
 from industrial_defect.trainer import run_epoch
-from industrial_defect.training_data import SeverstalSegmentationDataset, build_dataloader
+from industrial_defect.training_data import (
+    SeverstalSegmentationDataset,
+    build_dataloader,
+    compute_class_aware_sample_weights,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -29,6 +34,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-val-batches", type=int)
     parser.add_argument("--pretrained", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
+    parser.add_argument(
+        "--sampler",
+        choices=("random", "class-aware"),
+        default="random",
+    )
+    parser.add_argument("--sampling-power", type=float, default=0.5)
     parser.add_argument("--checkpoint", default="models/best_unet_resnet18.pt")
     parser.add_argument("--latest-checkpoint", default="models/latest_unet_resnet18.pt")
     parser.add_argument("--resume", help="Resume from a latest training checkpoint.")
@@ -95,10 +106,28 @@ def main() -> None:
         class_count=class_count,
         image_size=(image_size[0], image_size[1]),
     )
+
+    train_sampler: WeightedRandomSampler | None = None
+    sample_weights: torch.Tensor | None = None
+    if args.sampler == "class-aware":
+        sample_weights = compute_class_aware_sample_weights(
+            train_dataset.label_matrix,
+            power=args.sampling_power,
+        )
+        sampler_generator = torch.Generator()
+        sampler_generator.manual_seed(config.seed)
+        train_sampler = WeightedRandomSampler(
+            weights=sample_weights,
+            num_samples=len(train_dataset),
+            replacement=True,
+            generator=sampler_generator,
+        )
+
     train_loader = build_dataloader(
         train_dataset,
         batch_size=batch_size,
-        shuffle=True,
+        shuffle=train_sampler is None,
+        sampler=train_sampler,
         num_workers=workers,
         pin_memory=device.type == "cuda",
         drop_last=True,
@@ -161,6 +190,15 @@ def main() -> None:
     print("batch size:", batch_size)
     print("train/val samples:", len(train_dataset), len(val_dataset))
     print("AMP:", scaler.is_enabled())
+    print("sampler:", args.sampler)
+    if sample_weights is not None:
+        class_counts = train_dataset.label_matrix.sum(dim=0).tolist()
+        print("class-positive images:", class_counts)
+        print(
+            "sample-weight range:",
+            f"{float(sample_weights.min()):.3f}",
+            f"{float(sample_weights.max()):.3f}",
+        )
 
     for epoch in range(start_epoch, epochs + 1):
         train_results = run_epoch(
@@ -214,6 +252,13 @@ def main() -> None:
             "scheduler_state_dict": scheduler.state_dict(),
             "scaler_state_dict": scaler.state_dict(),
             "config": asdict(config),
+            "run_config": {
+                "sampler": args.sampler,
+                "sampling_power": args.sampling_power,
+                "image_size": list(image_size),
+                "batch_size": batch_size,
+                "workers": workers,
+            },
             "history": history,
         }
         save_checkpoint(latest_checkpoint_path, checkpoint_state)
