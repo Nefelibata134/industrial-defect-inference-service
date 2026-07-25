@@ -11,7 +11,7 @@ import torch
 from torch.utils.data import WeightedRandomSampler
 
 from industrial_defect.config import load_project_config
-from industrial_defect.loss import BCEDiceLoss
+from industrial_defect.loss import BCEDiceLoss, FocalDiceLoss
 from industrial_defect.model import build_segmentation_model
 from industrial_defect.trainer import run_epoch
 from industrial_defect.training_data import (
@@ -40,6 +40,13 @@ def parse_args() -> argparse.Namespace:
         default="random",
     )
     parser.add_argument("--sampling-power", type=float, default=0.5)
+    parser.add_argument(
+        "--loss",
+        choices=("bce-dice", "focal-dice"),
+        default="bce-dice",
+    )
+    parser.add_argument("--focal-alpha", type=float, default=0.75)
+    parser.add_argument("--focal-gamma", type=float, default=2.0)
     parser.add_argument("--checkpoint", default="models/best_unet_resnet18.pt")
     parser.add_argument("--latest-checkpoint", default="models/latest_unet_resnet18.pt")
     parser.add_argument("--resume", help="Resume from a latest training checkpoint.")
@@ -147,7 +154,13 @@ def main() -> None:
         class_count=class_count,
         pretrained=args.pretrained,
     ).to(device)
-    criterion = BCEDiceLoss()
+    if args.loss == "focal-dice":
+        criterion = FocalDiceLoss(
+            alpha=args.focal_alpha,
+            gamma=args.focal_gamma,
+        )
+    else:
+        criterion = BCEDiceLoss()
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=config.training.learning_rate,
@@ -191,6 +204,9 @@ def main() -> None:
     print("train/val samples:", len(train_dataset), len(val_dataset))
     print("AMP:", scaler.is_enabled())
     print("sampler:", args.sampler)
+    print("loss:", args.loss)
+    if args.loss == "focal-dice":
+        print("focal alpha/gamma:", args.focal_alpha, args.focal_gamma)
     if sample_weights is not None:
         class_counts = train_dataset.label_matrix.sum(dim=0).tolist()
         print("class-positive images:", class_counts)
@@ -255,6 +271,9 @@ def main() -> None:
             "run_config": {
                 "sampler": args.sampler,
                 "sampling_power": args.sampling_power,
+                "loss": args.loss,
+                "focal_alpha": args.focal_alpha,
+                "focal_gamma": args.focal_gamma,
                 "image_size": list(image_size),
                 "batch_size": batch_size,
                 "workers": workers,

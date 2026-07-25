@@ -202,6 +202,22 @@ python scripts/train.py \
   --history outputs/reports/class_aware_e05_training_history.json
 ```
 
+Run the focal-loss experiment while retaining the class-aware sampler:
+
+```bash
+python scripts/train.py \
+  --device cuda \
+  --epochs 5 \
+  --sampler class-aware \
+  --sampling-power 0.5 \
+  --loss focal-dice \
+  --focal-alpha 0.75 \
+  --focal-gamma 2.0 \
+  --checkpoint models/focal_class_aware_e05_best_unet_resnet18.pt \
+  --latest-checkpoint models/focal_class_aware_e05_latest_unet_resnet18.pt \
+  --history outputs/reports/focal_class_aware_e05_training_history.json
+```
+
 Resume an interrupted run from the latest completed epoch:
 
 ```bash
