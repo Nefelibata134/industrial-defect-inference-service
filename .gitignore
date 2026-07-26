@@ -18,6 +18,7 @@ outputs/*
 outputs/reports/*
 !outputs/reports/dataset_report.json
 !outputs/reports/split_summary.json
+!outputs/reports/onnx_parity.json
 runs/
 
 *.engine

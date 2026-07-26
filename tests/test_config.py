@@ -23,3 +23,10 @@ def test_project_config_contract() -> None:
     assert config.training.num_workers == 4
     assert config.training.amp is True
     assert config.training.threshold == 0.5
+    assert config.deployment.checkpoint.endswith("class_aware_p075_e05_best_unet_resnet18.pt")
+    assert config.deployment.onnx_model.endswith("unet_resnet18_severstal.onnx")
+    assert config.deployment.onnx_opset == 18
+    assert config.deployment.threshold == 0.8
+    assert config.deployment.input_name == "images"
+    assert config.deployment.output_name == "logits"
+    assert config.deployment.dynamic_batch is True

@@ -35,11 +35,23 @@ class TrainingConfig:
 
 
 @dataclass(frozen=True)
+class DeploymentConfig:
+    checkpoint: str
+    onnx_model: str
+    onnx_opset: int
+    threshold: float
+    input_name: str
+    output_name: str
+    dynamic_batch: bool
+
+
+@dataclass(frozen=True)
 class ProjectConfig:
     name: str
     seed: int
     dataset: DatasetConfig
     training: TrainingConfig
+    deployment: DeploymentConfig
 
 
 def _require(mapping: dict[str, Any], key: str) -> Any:
@@ -59,8 +71,12 @@ def load_project_config(path: str | Path) -> ProjectConfig:
     project_raw = _require(raw, "project")
     dataset_raw = _require(raw, "dataset")
     training_raw = _require(raw, "training")
-    if not all(isinstance(section, dict) for section in (project_raw, dataset_raw, training_raw)):
-        raise ValueError("project, dataset, and training must be mappings")
+    deployment_raw = _require(raw, "deployment")
+    if not all(
+        isinstance(section, dict)
+        for section in (project_raw, dataset_raw, training_raw, deployment_raw)
+    ):
+        raise ValueError("project, dataset, training, and deployment must be mappings")
 
     splits = tuple(_require(dataset_raw, "splits"))
     split_ratio = tuple(float(value) for value in _require(dataset_raw, "split_ratio"))
@@ -119,9 +135,30 @@ def load_project_config(path: str | Path) -> ProjectConfig:
     if not training.loss:
         raise ValueError("training.loss must be non-empty")
 
+    deployment = DeploymentConfig(
+        checkpoint=str(_require(deployment_raw, "checkpoint")),
+        onnx_model=str(_require(deployment_raw, "onnx_model")),
+        onnx_opset=int(_require(deployment_raw, "onnx_opset")),
+        threshold=float(_require(deployment_raw, "threshold")),
+        input_name=str(_require(deployment_raw, "input_name")),
+        output_name=str(_require(deployment_raw, "output_name")),
+        dynamic_batch=bool(_require(deployment_raw, "dynamic_batch")),
+    )
+    if deployment.onnx_opset < 13:
+        raise ValueError("deployment.onnx_opset must be at least 13")
+    if not 0.0 < deployment.threshold < 1.0:
+        raise ValueError("deployment.threshold must be between 0 and 1")
+    if not deployment.input_name or not deployment.output_name:
+        raise ValueError("deployment input and output names must be non-empty")
+    if deployment.input_name == deployment.output_name:
+        raise ValueError("deployment input and output names must differ")
+    if Path(deployment.onnx_model).suffix.lower() != ".onnx":
+        raise ValueError("deployment.onnx_model must use the .onnx suffix")
+
     return ProjectConfig(
         name=str(_require(project_raw, "name")),
         seed=int(_require(project_raw, "seed")),
         dataset=dataset,
         training=training,
+        deployment=deployment,
     )

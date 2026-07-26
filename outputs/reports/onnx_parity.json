@@ -1,0 +1,133 @@
+{
+  "artifacts": {
+    "checkpoint": "models/class_aware_p075_e05_best_unet_resnet18.pt",
+    "checkpoint_epoch": 2,
+    "checkpoint_sha256": "a6a2a76857ba0a1a857a78204f77a82f58c09f26996f41ba51bac42479393ccc",
+    "onnx_model": "models/unet_resnet18_severstal.onnx",
+    "onnx_sha256": "6622d3aada8f7fe0547c475f80a8697cb74f7e6e8c6b677a9dbaff45a4f03a0c"
+  },
+  "contract": {
+    "input": {
+      "dtype": "float32",
+      "name": "images",
+      "shape": [
+        "batch",
+        3,
+        256,
+        1024
+      ]
+    },
+    "output": {
+      "dtype": "float32",
+      "name": "logits",
+      "shape": [
+        "batch",
+        4,
+        256,
+        1024
+      ]
+    },
+    "postprocess": "sigmoid",
+    "threshold": 0.8
+  },
+  "criteria": {
+    "mask_mismatch_tolerance": 1e-06,
+    "max_abs_tolerance": 0.001,
+    "mean_abs_tolerance": 1e-05,
+    "metric_delta_tolerance": 1e-06
+  },
+  "numerical_parity": {
+    "mask_mismatch_pixels": 0,
+    "mask_mismatch_ratio": 0.0,
+    "max_abs_error": 9.72747802734375e-05,
+    "mean_abs_error": 1.9139116034239123e-06
+  },
+  "quality_parity": {
+    "macro_dice_abs_delta": 0.0,
+    "onnxruntime": {
+      "image_false_negative_rate": 0.0,
+      "macro_dice": 0.46670636228218426,
+      "macro_iou": 0.3928185950655305,
+      "macro_precision": 0.50215539853932,
+      "macro_recall": 0.7032347737320606,
+      "per_class_dice": [
+        0.0,
+        1.0,
+        0.30250811037080966,
+        0.5643173387579274
+      ],
+      "per_class_iou": [
+        0.0,
+        1.0,
+        0.1782088693436357,
+        0.3930655109184864
+      ],
+      "per_class_precision": [
+        0.0,
+        1.0,
+        0.26098471168893705,
+        0.7476368824683431
+      ],
+      "per_class_recall": [
+        1.0,
+        1.0,
+        0.3597444619596781,
+        0.45319463296856416
+      ]
+    },
+    "pytorch": {
+      "image_false_negative_rate": 0.0,
+      "macro_dice": 0.46670636228218426,
+      "macro_iou": 0.3928185950655305,
+      "macro_precision": 0.50215539853932,
+      "macro_recall": 0.7032347737320606,
+      "per_class_dice": [
+        0.0,
+        1.0,
+        0.30250811037080966,
+        0.5643173387579274
+      ],
+      "per_class_iou": [
+        0.0,
+        1.0,
+        0.1782088693436357,
+        0.3930655109184864
+      ],
+      "per_class_precision": [
+        0.0,
+        1.0,
+        0.26098471168893705,
+        0.7476368824683431
+      ],
+      "per_class_recall": [
+        1.0,
+        1.0,
+        0.3597444619596781,
+        0.45319463296856416
+      ]
+    }
+  },
+  "regression_set": {
+    "batch_size": 2,
+    "image_ids": [
+      "0007a71bf.jpg",
+      "000f6bf48.jpg",
+      "001982b08.jpg",
+      "0030401a5.jpg",
+      "006a4402e.jpg",
+      "0074d81d0.jpg",
+      "0095cd374.jpg",
+      "00b989e78.jpg"
+    ],
+    "samples": 8,
+    "split": "val"
+  },
+  "runtime": {
+    "onnxruntime": "1.23.2",
+    "providers": [
+      "CPUExecutionProvider"
+    ],
+    "torch": "2.12.1+cu130"
+  },
+  "status": "pass"
+}

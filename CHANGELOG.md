@@ -18,11 +18,15 @@ linked to reproducible reports and immutable model artifacts.
 - U-Net ResNet-18 baseline with AMP, checkpoint recovery, and early stopping.
 - Threshold sweeps, per-image error analysis, and failure visualization.
 - Validation ablation report and promoted-checkpoint selection policy.
+- Reproducible checkpoint-to-ONNX export with embedded artifact metadata.
+- ONNX graph inspection, structural validation, and dynamic-batch contract
+  tests.
+- PyTorch-to-ONNX Runtime logit, mask, and metric parity report.
 - CPU unit tests, Ruff checks, and GitHub Actions workflow.
 
 ### Planned
 
 - Frozen validation/test quality report for the promoted checkpoint.
-- ONNX parity and TensorRT FP32/FP16 comparison.
+- TensorRT FP32/FP16 comparison.
 - Triton model repository and FastAPI gateway.
 - Docker Compose, observability, and load-test report.

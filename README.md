@@ -269,6 +269,41 @@ training and threshold policy is finalized.
 See [Model Selection Report](docs/model-selection.md) for the validation
 protocol, checkpoint hash, per-class metrics, and reproduction commands.
 
+## ONNX Export and Parity
+
+The promoted checkpoint is exported as a self-contained ONNX graph with a
+dynamic batch dimension and fixed channel and spatial dimensions. Model
+metadata binds the graph to its source checkpoint, architecture, class order,
+input contract, and postprocessing threshold.
+
+```bash
+python -m pip install -e ".[train,export,dev]"
+
+python scripts/export_onnx.py
+python scripts/inspect_onnx.py
+python scripts/verify_onnx_parity.py --samples 8 --batch-size 2
+```
+
+Frozen graph contract:
+
+| Item | Value |
+| --- | --- |
+| Input | `images`, float32, `[batch, 3, 256, 1024]` |
+| Output | `logits`, float32, `[batch, 4, 256, 1024]` |
+| ONNX opset | 18 |
+| Dynamic axis | Batch only |
+| Postprocessing | Sigmoid followed by threshold `0.80` |
+
+The CPU regression set passed PyTorch-to-ONNX Runtime parity with maximum
+absolute logit error `9.73e-05`, mean absolute error `1.91e-06`, zero
+thresholded-mask mismatches, and zero macro-Dice delta. The same graph was
+also exercised with batch sizes `2` and `4` without re-export.
+
+The regression set verifies conversion correctness; it is not a replacement
+for the full validation quality report. Artifact hashes, acceptance
+tolerances, metadata, and reproduction details are recorded in
+[ONNX Export and Parity](docs/onnx-parity.md).
+
 Resume an interrupted run from the latest completed epoch:
 
 ```bash

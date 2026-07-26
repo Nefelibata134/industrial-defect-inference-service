@@ -31,6 +31,15 @@ training:
     - binary_cross_entropy
     - dice
 
+deployment:
+  checkpoint: models/class_aware_p075_e05_best_unet_resnet18.pt
+  onnx_model: models/unet_resnet18_severstal.onnx
+  onnx_opset: 18
+  threshold: 0.80
+  input_name: images
+  output_name: logits
+  dynamic_batch: true
+
 evaluation:
   primary_metric: macro_dice
   quality_metrics:
