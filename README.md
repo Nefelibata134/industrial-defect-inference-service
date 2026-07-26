@@ -188,6 +188,33 @@ python scripts/evaluate_thresholds.py \
   --checkpoint models/best_unet_resnet18.pt
 ```
 
+Generate aggregate, per-class, and per-image validation error reports:
+
+```bash
+python scripts/analyze_errors.py \
+  --device cuda \
+  --threshold 0.80 \
+  --checkpoint models/class_aware_p075_e05_best_unet_resnet18.pt
+```
+
+Render selected best-overlap, false-positive, false-negative, and
+mislocalized examples from an error-analysis report:
+
+```bash
+python scripts/visualize_errors.py \
+  --device cuda \
+  --analysis-report outputs/reports/error_analysis.json
+```
+
+Each comparison panel contains the original image, the ground-truth mask,
+the predicted mask, and a pixel-error map. The error map uses green for true
+positives, red for false positives, and blue for false negatives.
+
+The JSON report contains pixel metrics, image-level confusion counts, and
+ranked examples for a focus class. The CSV report contains one row per image
+and class so individual false positives, false negatives, and localization
+failures can be reproduced. Generated reports and checkpoints remain local.
+
 Run the class-aware sampling experiment while keeping the baseline loss and
 model unchanged:
 
@@ -217,6 +244,30 @@ python scripts/train.py \
   --latest-checkpoint models/focal_class_aware_e05_latest_unet_resnet18.pt \
   --history outputs/reports/focal_class_aware_e05_training_history.json
 ```
+
+## Validation Model Selection
+
+The promoted checkpoint keeps the deployment graph intentionally compact:
+single-head U-Net with a ResNet-18 encoder, BCE plus Dice loss, and class-aware
+sampling with `sampling_power=0.75`. Threshold selection is performed only on
+the validation split.
+
+| Candidate | Epochs | Best validation threshold | Macro Dice | Decision |
+| --- | ---: | ---: | ---: | --- |
+| Random sampling baseline | 5 | 0.05 | 0.2851 | Rejected |
+| Class-aware sampling, power 0.50 | 5 | 0.70 | 0.3846 | Rejected |
+| Class-aware sampling, power 0.75 | 5 | 0.80 | **0.3998** | **Promoted** |
+| Controlled sampling with augmentation | 15 | 0.50 | 0.3206 | Rejected |
+| Auxiliary classification with soft gating | 15 | 0.50 | 0.3292 | Rejected |
+
+At the promoted global threshold of `0.80`, per-class Dice is `0.2258`,
+`0.3449`, `0.5484`, and `0.4799`. The longer candidates collapsed the two rare
+classes, so additional architecture and sampling complexity was not carried
+into the production path. The frozen test split remains untouched until the
+training and threshold policy is finalized.
+
+See [Model Selection Report](docs/model-selection.md) for the validation
+protocol, checkpoint hash, per-class metrics, and reproduction commands.
 
 Resume an interrupted run from the latest completed epoch:
 

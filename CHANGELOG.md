@@ -15,11 +15,14 @@ linked to reproducible reports and immutable model artifacts.
 - Local mask-overlay validation command.
 - Versioned project configuration.
 - System design, dataset card, benchmark protocol, and architecture decisions.
+- U-Net ResNet-18 baseline with AMP, checkpoint recovery, and early stopping.
+- Threshold sweeps, per-image error analysis, and failure visualization.
+- Validation ablation report and promoted-checkpoint selection policy.
 - CPU unit tests, Ruff checks, and GitHub Actions workflow.
 
 ### Planned
 
-- PyTorch segmentation baseline and quality report.
+- Frozen validation/test quality report for the promoted checkpoint.
 - ONNX parity and TensorRT FP32/FP16 comparison.
 - Triton model repository and FastAPI gateway.
 - Docker Compose, observability, and load-test report.
