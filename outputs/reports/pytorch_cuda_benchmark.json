@@ -1,0 +1,144 @@
+{
+  "artifact_path": "models/class_aware_p075_e05_best_unet_resnet18.pt",
+  "artifact_sha256": "a6a2a76857ba0a1a857a78204f77a82f58c09f26996f41ba51bac42479393ccc",
+  "backend": "pytorch-cuda",
+  "postprocessing_included": false,
+  "preprocessing_included": false,
+  "results": [
+    {
+      "batch_size": 1,
+      "image_ids": [
+        "0007a71bf.jpg"
+      ],
+      "input_shape": [
+        1,
+        3,
+        256,
+        1024
+      ],
+      "latency": {
+        "max_ms": 9.59318100103701,
+        "mean_ms": 7.0211622240021825,
+        "min_ms": 6.682689998342539,
+        "p50_ms": 6.9453624992092955,
+        "p95_ms": 7.483682800739189,
+        "p99_ms": 8.23640020116727,
+        "throughput_images_per_second": 142.42656245449672
+      },
+      "output_shape": [
+        1,
+        4,
+        256,
+        1024
+      ],
+      "runtime": {
+        "cuda_version": "13.0",
+        "framework_version": "2.12.1+cu130",
+        "gpu_memory_delta_bytes": 232783872,
+        "gpu_memory_measurement": "cudaMemGetInfo delta before load to after warmup",
+        "gpu_memory_total_bytes": 8585216000,
+        "gpu_process_memory_mib": null,
+        "torch_peak_allocated_bytes": 161921024,
+        "torch_peak_reserved_bytes": 209715200
+      }
+    },
+    {
+      "batch_size": 4,
+      "image_ids": [
+        "0007a71bf.jpg",
+        "000f6bf48.jpg",
+        "001982b08.jpg",
+        "0030401a5.jpg"
+      ],
+      "input_shape": [
+        4,
+        3,
+        256,
+        1024
+      ],
+      "latency": {
+        "max_ms": 44.60175799977151,
+        "mean_ms": 33.163943688083236,
+        "min_ms": 28.93573999972432,
+        "p50_ms": 33.221061999938684,
+        "p95_ms": 36.86623565063201,
+        "p99_ms": 38.98241963939654,
+        "throughput_images_per_second": 120.61291737862031
+      },
+      "output_shape": [
+        4,
+        4,
+        256,
+        1024
+      ],
+      "runtime": {
+        "cuda_version": "13.0",
+        "framework_version": "2.12.1+cu130",
+        "gpu_memory_delta_bytes": 599785472,
+        "gpu_memory_measurement": "cudaMemGetInfo delta before load to after warmup",
+        "gpu_memory_total_bytes": 8585216000,
+        "gpu_process_memory_mib": null,
+        "torch_peak_allocated_bytes": 472561664,
+        "torch_peak_reserved_bytes": 599785472
+      }
+    },
+    {
+      "batch_size": 8,
+      "image_ids": [
+        "0007a71bf.jpg",
+        "000f6bf48.jpg",
+        "001982b08.jpg",
+        "0030401a5.jpg",
+        "006a4402e.jpg",
+        "0074d81d0.jpg",
+        "0095cd374.jpg",
+        "00b989e78.jpg"
+      ],
+      "input_shape": [
+        8,
+        3,
+        256,
+        1024
+      ],
+      "latency": {
+        "max_ms": 84.28791900041688,
+        "mean_ms": 68.1269606239839,
+        "min_ms": 62.035350001679035,
+        "p50_ms": 67.77750799938076,
+        "p95_ms": 74.46759075164664,
+        "p99_ms": 77.96042975054661,
+        "throughput_images_per_second": 117.42781311138695
+      },
+      "output_shape": [
+        8,
+        4,
+        256,
+        1024
+      ],
+      "runtime": {
+        "cuda_version": "13.0",
+        "framework_version": "2.12.1+cu130",
+        "gpu_memory_delta_bytes": 1226833920,
+        "gpu_memory_measurement": "cudaMemGetInfo delta before load to after warmup",
+        "gpu_memory_total_bytes": 8585216000,
+        "gpu_process_memory_mib": null,
+        "torch_peak_allocated_bytes": 884914176,
+        "torch_peak_reserved_bytes": 1226833920
+      }
+    }
+  ],
+  "status": "pass",
+  "system": {
+    "gpu": {
+      "available": true,
+      "driver_version": "610.47",
+      "memory_total_mib": 8188,
+      "name": "NVIDIA GeForce RTX 4070 Laptop GPU"
+    },
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "python": "3.10.20"
+  },
+  "test_runs": 500,
+  "timing_boundary": "CPU float32 tensor input to CPU float32 logits output",
+  "warmup_runs": 50
+}

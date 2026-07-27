@@ -35,6 +35,10 @@ deployment:
   checkpoint: models/class_aware_p075_e05_best_unet_resnet18.pt
   onnx_model: models/unet_resnet18_severstal.onnx
   onnx_opset: 18
+  tensorrt_fp32_engine: models/unet_resnet18_severstal_fp32.plan
+  tensorrt_fp16_engine: models/unet_resnet18_severstal_fp16.plan
+  tensorrt_profile_batch: [1, 4, 8]
+  tensorrt_workspace_gib: 2
   threshold: 0.80
   input_name: images
   output_name: logits

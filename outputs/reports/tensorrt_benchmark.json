@@ -1,0 +1,312 @@
+{
+  "logit_threshold": 1.3862943611198908,
+  "onnx_path": "models/unet_resnet18_severstal.onnx",
+  "onnx_sha256": "6622d3aada8f7fe0547c475f80a8697cb74f7e6e8c6b677a9dbaff45a4f03a0c",
+  "probability_threshold": 0.8,
+  "results": [
+    {
+      "acceptance": {
+        "limits": {
+          "mask_mismatch_rate": 0.0,
+          "max_abs_error": 0.001,
+          "mean_abs_error": 0.0001
+        },
+        "passed": true
+      },
+      "batch_size": 1,
+      "context_and_io_bytes": 556793856,
+      "engine_device_memory_bytes": 549453824,
+      "engine_path": "models/unet_resnet18_severstal_fp32.plan",
+      "engine_sha256": "423e92182d30e232ab6c85c11145bfeb27c70b48cf9aaf604eb5e6b9cf433c7f",
+      "engine_size_bytes": 98989956,
+      "gpu_inference": {
+        "max_ms": 8.984607696533203,
+        "mean_ms": 3.7195909810066223,
+        "min_ms": 3.624799966812134,
+        "p50_ms": 3.6755040884017944,
+        "p95_ms": 3.8115135192871095,
+        "p99_ms": 4.23552344322204,
+        "throughput_images_per_second": 268.84676436369165
+      },
+      "gpu_process_memory_mib": null,
+      "image_ids": [
+        "0007a71bf.jpg"
+      ],
+      "io_buffer_bytes": 7340032,
+      "mask_mismatch_pixels": 0,
+      "mask_mismatch_rate": 0.0,
+      "max_abs_error_vs_ort": 2.574920654296875e-05,
+      "mean_abs_error_vs_ort": 1.166646825367934e-06,
+      "memory_capacity_note": "context_and_io_bytes excludes engine weights, CUDA context overhead, and allocator caching",
+      "precision": "fp32",
+      "wall_inference": {
+        "max_ms": 10.475491000761394,
+        "mean_ms": 5.18278998002279,
+        "min_ms": 4.816610000489163,
+        "p50_ms": 5.133472000125039,
+        "p95_ms": 5.631330599044304,
+        "p99_ms": 6.5162216600219836,
+        "throughput_images_per_second": 192.94627099583974
+      }
+    },
+    {
+      "acceptance": {
+        "limits": {
+          "mask_mismatch_rate": 0.0001,
+          "max_abs_error": 2.0,
+          "mean_abs_error": 0.05
+        },
+        "passed": true
+      },
+      "batch_size": 1,
+      "context_and_io_bytes": 282066944,
+      "engine_device_memory_bytes": 274726912,
+      "engine_path": "models/unet_resnet18_severstal_fp16.plan",
+      "engine_sha256": "0e040ac97a207baf476a07716c16e4c9c024d85d286ac1977e7be8b127ce201d",
+      "engine_size_bytes": 31494324,
+      "gpu_inference": {
+        "max_ms": 2.752959966659546,
+        "mean_ms": 1.8882375671863556,
+        "min_ms": 1.852512001991272,
+        "p50_ms": 1.8733599781990051,
+        "p95_ms": 1.9319983601570128,
+        "p99_ms": 2.4031459450721737,
+        "throughput_images_per_second": 529.5943780475093
+      },
+      "gpu_process_memory_mib": null,
+      "image_ids": [
+        "0007a71bf.jpg"
+      ],
+      "io_buffer_bytes": 7340032,
+      "mask_mismatch_pixels": 12,
+      "mask_mismatch_rate": 1.1444091796875e-05,
+      "max_abs_error_vs_ort": 1.0962457656860352,
+      "mean_abs_error_vs_ort": 0.02156800404191017,
+      "memory_capacity_note": "context_and_io_bytes excludes engine weights, CUDA context overhead, and allocator caching",
+      "precision": "fp16",
+      "wall_inference": {
+        "max_ms": 6.862210000690538,
+        "mean_ms": 3.217246990003332,
+        "min_ms": 2.99790499957453,
+        "p50_ms": 3.1577899999319925,
+        "p95_ms": 3.4530077509771218,
+        "p99_ms": 3.9717137492334573,
+        "throughput_images_per_second": 310.8247526867573
+      }
+    },
+    {
+      "acceptance": {
+        "limits": {
+          "mask_mismatch_rate": 0.0,
+          "max_abs_error": 0.001,
+          "mean_abs_error": 0.0001
+        },
+        "passed": true
+      },
+      "batch_size": 4,
+      "context_and_io_bytes": 578813952,
+      "engine_device_memory_bytes": 549453824,
+      "engine_path": "models/unet_resnet18_severstal_fp32.plan",
+      "engine_sha256": "423e92182d30e232ab6c85c11145bfeb27c70b48cf9aaf604eb5e6b9cf433c7f",
+      "engine_size_bytes": 98989956,
+      "gpu_inference": {
+        "max_ms": 16.32268714904785,
+        "mean_ms": 14.31710457420349,
+        "min_ms": 13.345120429992676,
+        "p50_ms": 14.331808090209961,
+        "p95_ms": 15.204461050033569,
+        "p99_ms": 16.08174451828003,
+        "throughput_images_per_second": 279.38609928205636
+      },
+      "gpu_process_memory_mib": null,
+      "image_ids": [
+        "0007a71bf.jpg",
+        "000f6bf48.jpg",
+        "001982b08.jpg",
+        "0030401a5.jpg"
+      ],
+      "io_buffer_bytes": 29360128,
+      "mask_mismatch_pixels": 0,
+      "mask_mismatch_rate": 0.0,
+      "max_abs_error_vs_ort": 3.814697265625e-05,
+      "mean_abs_error_vs_ort": 1.1778918178606546e-06,
+      "memory_capacity_note": "context_and_io_bytes excludes engine weights, CUDA context overhead, and allocator caching",
+      "precision": "fp32",
+      "wall_inference": {
+        "max_ms": 25.759277999895858,
+        "mean_ms": 20.575431799959915,
+        "min_ms": 18.43123700018623,
+        "p50_ms": 20.525022999208886,
+        "p95_ms": 22.117909450844305,
+        "p99_ms": 22.86955811061489,
+        "throughput_images_per_second": 194.40661264799277
+      }
+    },
+    {
+      "acceptance": {
+        "limits": {
+          "mask_mismatch_rate": 0.0001,
+          "max_abs_error": 2.0,
+          "mean_abs_error": 0.05
+        },
+        "passed": true
+      },
+      "batch_size": 4,
+      "context_and_io_bytes": 304087040,
+      "engine_device_memory_bytes": 274726912,
+      "engine_path": "models/unet_resnet18_severstal_fp16.plan",
+      "engine_sha256": "0e040ac97a207baf476a07716c16e4c9c024d85d286ac1977e7be8b127ce201d",
+      "engine_size_bytes": 31494324,
+      "gpu_inference": {
+        "max_ms": 6.235712051391602,
+        "mean_ms": 5.265378132820129,
+        "min_ms": 5.174784183502197,
+        "p50_ms": 5.254208087921143,
+        "p95_ms": 5.345111894607544,
+        "p99_ms": 5.753572940826415,
+        "throughput_images_per_second": 759.6795328083314
+      },
+      "gpu_process_memory_mib": null,
+      "image_ids": [
+        "0007a71bf.jpg",
+        "000f6bf48.jpg",
+        "001982b08.jpg",
+        "0030401a5.jpg"
+      ],
+      "io_buffer_bytes": 29360128,
+      "mask_mismatch_pixels": 56,
+      "mask_mismatch_rate": 1.33514404296875e-05,
+      "max_abs_error_vs_ort": 1.2251081466674805,
+      "mean_abs_error_vs_ort": 0.02286255545914173,
+      "memory_capacity_note": "context_and_io_bytes excludes engine weights, CUDA context overhead, and allocator caching",
+      "precision": "fp16",
+      "wall_inference": {
+        "max_ms": 12.544552999315783,
+        "mean_ms": 10.30999337598405,
+        "min_ms": 9.773151999979746,
+        "p50_ms": 10.11181600006239,
+        "p95_ms": 11.407298300673574,
+        "p99_ms": 12.274594118534878,
+        "throughput_images_per_second": 387.97309116779286
+      }
+    },
+    {
+      "acceptance": {
+        "limits": {
+          "mask_mismatch_rate": 0.0,
+          "max_abs_error": 0.001,
+          "mean_abs_error": 0.0001
+        },
+        "passed": true
+      },
+      "batch_size": 8,
+      "context_and_io_bytes": 608174080,
+      "engine_device_memory_bytes": 549453824,
+      "engine_path": "models/unet_resnet18_severstal_fp32.plan",
+      "engine_sha256": "423e92182d30e232ab6c85c11145bfeb27c70b48cf9aaf604eb5e6b9cf433c7f",
+      "engine_size_bytes": 98989956,
+      "gpu_inference": {
+        "max_ms": 46.69724655151367,
+        "mean_ms": 32.436328495025634,
+        "min_ms": 28.451200485229492,
+        "p50_ms": 32.13651084899902,
+        "p95_ms": 35.65065155029297,
+        "p99_ms": 37.21239463806152,
+        "throughput_images_per_second": 246.63703850535558
+      },
+      "gpu_process_memory_mib": null,
+      "image_ids": [
+        "0007a71bf.jpg",
+        "000f6bf48.jpg",
+        "001982b08.jpg",
+        "0030401a5.jpg",
+        "006a4402e.jpg",
+        "0074d81d0.jpg",
+        "0095cd374.jpg",
+        "00b989e78.jpg"
+      ],
+      "io_buffer_bytes": 58720256,
+      "mask_mismatch_pixels": 0,
+      "mask_mismatch_rate": 0.0,
+      "max_abs_error_vs_ort": 3.814697265625e-05,
+      "mean_abs_error_vs_ort": 1.1992543704764103e-06,
+      "memory_capacity_note": "context_and_io_bytes excludes engine weights, CUDA context overhead, and allocator caching",
+      "precision": "fp32",
+      "wall_inference": {
+        "max_ms": 64.60936500116077,
+        "mean_ms": 44.88457107198337,
+        "min_ms": 38.5607180014631,
+        "p50_ms": 44.812810499024636,
+        "p95_ms": 49.51052175028963,
+        "p99_ms": 55.348608000131186,
+        "throughput_images_per_second": 178.23496602362638
+      }
+    },
+    {
+      "acceptance": {
+        "limits": {
+          "mask_mismatch_rate": 0.0001,
+          "max_abs_error": 2.0,
+          "mean_abs_error": 0.05
+        },
+        "passed": true
+      },
+      "batch_size": 8,
+      "context_and_io_bytes": 333447168,
+      "engine_device_memory_bytes": 274726912,
+      "engine_path": "models/unet_resnet18_severstal_fp16.plan",
+      "engine_sha256": "0e040ac97a207baf476a07716c16e4c9c024d85d286ac1977e7be8b127ce201d",
+      "engine_size_bytes": 31494324,
+      "gpu_inference": {
+        "max_ms": 13.847455978393555,
+        "mean_ms": 11.28872113418579,
+        "min_ms": 10.6461763381958,
+        "p50_ms": 11.025216102600098,
+        "p95_ms": 12.739689350128174,
+        "p99_ms": 13.408157539367675,
+        "throughput_images_per_second": 708.6719483018753
+      },
+      "gpu_process_memory_mib": null,
+      "image_ids": [
+        "0007a71bf.jpg",
+        "000f6bf48.jpg",
+        "001982b08.jpg",
+        "0030401a5.jpg",
+        "006a4402e.jpg",
+        "0074d81d0.jpg",
+        "0095cd374.jpg",
+        "00b989e78.jpg"
+      ],
+      "io_buffer_bytes": 58720256,
+      "mask_mismatch_pixels": 95,
+      "mask_mismatch_rate": 1.1324882507324219e-05,
+      "max_abs_error_vs_ort": 1.308415412902832,
+      "mean_abs_error_vs_ort": 0.02136247232556343,
+      "memory_capacity_note": "context_and_io_bytes excludes engine weights, CUDA context overhead, and allocator caching",
+      "precision": "fp16",
+      "wall_inference": {
+        "max_ms": 34.45032399940828,
+        "mean_ms": 24.838499253983173,
+        "min_ms": 21.21048300068651,
+        "p50_ms": 24.338063498362317,
+        "p95_ms": 29.927927099652152,
+        "p99_ms": 32.71388458044384,
+        "throughput_images_per_second": 322.0806506140703
+      }
+    }
+  ],
+  "status": "pass",
+  "system": {
+    "gpu": {
+      "available": true,
+      "driver_version": "610.47",
+      "memory_total_mib": 8188,
+      "name": "NVIDIA GeForce RTX 4070 Laptop GPU"
+    },
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "python": "3.10.20"
+  },
+  "tensorrt_version": "10.9.0.34",
+  "test_runs": 500,
+  "warmup_runs": 50
+}

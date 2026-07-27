@@ -304,6 +304,38 @@ for the full validation quality report. Artifact hashes, acceptance
 tolerances, metadata, and reproduction details are recorded in
 [ONNX Export and Parity](docs/onnx-parity.md).
 
+## TensorRT Build and Benchmark
+
+The ONNX graph is compiled into strict FP32 and mixed-precision FP16 TensorRT
+engines. Both engines expose float32 tensor I/O and one optimization profile:
+minimum batch `1`, optimum batch `4`, and maximum batch `8`.
+
+```bash
+python -m pip install -e ".[export,tensorrt,dev]"
+
+python scripts/build_tensorrt.py --precision both
+python scripts/benchmark_tensorrt.py
+```
+
+RTX 4070 Laptop GPU results use 50 warmup runs and 500 measured runs. The
+cross-backend boundary starts with a normalized CPU float32 tensor and ends
+with CPU float32 logits; image decoding, normalization, and thresholding are
+excluded.
+
+| Backend | Precision | Batch 1 mean | Batch 4 mean | Batch 8 mean | Batch 8 throughput |
+| --- | --- | ---: | ---: | ---: | ---: |
+| PyTorch CUDA | FP32 | 7.02 ms | 33.16 ms | 68.13 ms | 117.4 images/s |
+| ONNX Runtime CUDA | FP32 | 8.23 ms | 33.89 ms | 70.96 ms | 112.7 images/s |
+| TensorRT | FP32 | 5.18 ms | 20.58 ms | 44.88 ms | 178.2 images/s |
+| TensorRT | FP16 | **3.22 ms** | **10.31 ms** | **24.84 ms** | **322.1 images/s** |
+
+FP32 TensorRT produced zero thresholded-mask mismatches against ONNX Runtime.
+FP16 mismatch rates remained between `1.07e-05` and `1.34e-05`, below the
+declared `1e-04` acceptance limit. Engine build settings, hashes, memory
+capacity indicators, numerical tolerances, detailed percentiles, and
+environment limitations are in
+[TensorRT Build and Benchmark](docs/tensorrt-benchmark.md).
+
 Resume an interrupted run from the latest completed epoch:
 
 ```bash

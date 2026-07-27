@@ -19,6 +19,10 @@ outputs/reports/*
 !outputs/reports/dataset_report.json
 !outputs/reports/split_summary.json
 !outputs/reports/onnx_parity.json
+!outputs/reports/tensorrt_build.json
+!outputs/reports/tensorrt_benchmark.json
+!outputs/reports/pytorch_cuda_benchmark.json
+!outputs/reports/onnxruntime_cuda_benchmark.json
 runs/
 
 *.engine

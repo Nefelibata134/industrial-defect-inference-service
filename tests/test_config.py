@@ -26,6 +26,10 @@ def test_project_config_contract() -> None:
     assert config.deployment.checkpoint.endswith("class_aware_p075_e05_best_unet_resnet18.pt")
     assert config.deployment.onnx_model.endswith("unet_resnet18_severstal.onnx")
     assert config.deployment.onnx_opset == 18
+    assert config.deployment.tensorrt_fp32_engine.endswith("_fp32.plan")
+    assert config.deployment.tensorrt_fp16_engine.endswith("_fp16.plan")
+    assert config.deployment.tensorrt_profile_batch == (1, 4, 8)
+    assert config.deployment.tensorrt_workspace_gib == 2
     assert config.deployment.threshold == 0.8
     assert config.deployment.input_name == "images"
     assert config.deployment.output_name == "logits"

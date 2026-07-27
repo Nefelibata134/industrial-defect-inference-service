@@ -55,6 +55,11 @@ underspecified timer.
 - Throughput, peak GPU memory, and GPU utilization.
 - Included and excluded preprocessing, transfer, queue, and postprocessing.
 
+When a backend cannot expose allocator-level peak memory through a common
+API, the report states the exact alternative method. CUDA free-memory deltas
+and TensorRT execution-context plus I/O capacity are retained as different
+metrics and are not ranked as if they were equivalent.
+
 ## Initial Model Benchmark
 
 ```text
@@ -79,3 +84,6 @@ Triton and gateway tests additionally report:
 
 The final report includes raw machine-readable output and a concise comparison
 table. Results are not copied between different hardware or engine builds.
+
+The initial TensorRT and cross-backend result is documented in
+[`tensorrt-benchmark.md`](tensorrt-benchmark.md).

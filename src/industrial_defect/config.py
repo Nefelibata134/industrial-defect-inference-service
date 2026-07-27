@@ -39,6 +39,10 @@ class DeploymentConfig:
     checkpoint: str
     onnx_model: str
     onnx_opset: int
+    tensorrt_fp32_engine: str
+    tensorrt_fp16_engine: str
+    tensorrt_profile_batch: tuple[int, int, int]
+    tensorrt_workspace_gib: int
     threshold: float
     input_name: str
     output_name: str
@@ -85,6 +89,9 @@ def load_project_config(path: str | Path) -> ProjectConfig:
     training_image_size = tuple(
         int(value) for value in _require(training_raw, "image_size")
     )
+    tensorrt_profile_batch = tuple(
+        int(value) for value in _require(deployment_raw, "tensorrt_profile_batch")
+    )
 
     if len(splits) != len(split_ratio):
         raise ValueError("splits and split_ratio must have the same length")
@@ -96,6 +103,14 @@ def load_project_config(path: str | Path) -> ProjectConfig:
         raise ValueError("training.image_size must contain positive width and height")
     if not classes or len(set(classes)) != len(classes):
         raise ValueError("classes must be non-empty and unique")
+    if (
+        len(tensorrt_profile_batch) != 3
+        or any(value <= 0 for value in tensorrt_profile_batch)
+        or list(tensorrt_profile_batch) != sorted(tensorrt_profile_batch)
+    ):
+        raise ValueError(
+            "deployment.tensorrt_profile_batch must contain positive min/opt/max values"
+        )
 
     dataset = DatasetConfig(
         name=str(_require(dataset_raw, "name")),
@@ -139,6 +154,16 @@ def load_project_config(path: str | Path) -> ProjectConfig:
         checkpoint=str(_require(deployment_raw, "checkpoint")),
         onnx_model=str(_require(deployment_raw, "onnx_model")),
         onnx_opset=int(_require(deployment_raw, "onnx_opset")),
+        tensorrt_fp32_engine=str(
+            _require(deployment_raw, "tensorrt_fp32_engine")
+        ),
+        tensorrt_fp16_engine=str(
+            _require(deployment_raw, "tensorrt_fp16_engine")
+        ),
+        tensorrt_profile_batch=tensorrt_profile_batch,
+        tensorrt_workspace_gib=int(
+            _require(deployment_raw, "tensorrt_workspace_gib")
+        ),
         threshold=float(_require(deployment_raw, "threshold")),
         input_name=str(_require(deployment_raw, "input_name")),
         output_name=str(_require(deployment_raw, "output_name")),
@@ -154,6 +179,20 @@ def load_project_config(path: str | Path) -> ProjectConfig:
         raise ValueError("deployment input and output names must differ")
     if Path(deployment.onnx_model).suffix.lower() != ".onnx":
         raise ValueError("deployment.onnx_model must use the .onnx suffix")
+    engine_paths = (
+        deployment.tensorrt_fp32_engine,
+        deployment.tensorrt_fp16_engine,
+    )
+    valid_engine_suffixes = {".engine", ".plan", ".trt"}
+    if any(
+        Path(path).suffix.lower() not in valid_engine_suffixes
+        for path in engine_paths
+    ):
+        raise ValueError("deployment TensorRT engines must use .engine, .plan, or .trt")
+    if len(set(engine_paths)) != len(engine_paths):
+        raise ValueError("deployment TensorRT engine paths must differ")
+    if deployment.tensorrt_workspace_gib <= 0:
+        raise ValueError("deployment.tensorrt_workspace_gib must be positive")
 
     return ProjectConfig(
         name=str(_require(project_raw, "name")),

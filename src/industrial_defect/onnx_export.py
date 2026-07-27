@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
@@ -10,16 +9,9 @@ import torch
 from onnx import TensorProto
 from torch import nn
 
+from industrial_defect.artifacts import sha256_file
 from industrial_defect.config import ProjectConfig
 from industrial_defect.model import build_segmentation_model
-
-
-def sha256_file(path: str | Path) -> str:
-    digest = hashlib.sha256()
-    with Path(path).open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def load_inference_model(
