@@ -1,0 +1,65 @@
+name: industrial-defect-inference-service
+
+services:
+  triton:
+    image: nvcr.io/nvidia/tritonserver:25.03-py3
+    command:
+      - tritonserver
+      - --model-repository=/models
+      - --strict-model-config=true
+      - --model-control-mode=none
+      - --log-verbose=0
+    gpus: all
+    shm_size: 1gb
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+      - "8002:8002"
+    volumes:
+      - ./model_repository:/models:ro
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8000/v2/health/ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 24
+      start_period: 20s
+
+  api:
+    build:
+      context: .
+      dockerfile: deploy/api.Dockerfile
+    environment:
+      TRITON_URL: triton:8000
+      TRITON_MODEL_NAME: steel_defect_segmentation
+      TRITON_MODEL_VERSION: "1"
+      SEGMENTATION_THRESHOLD: "0.80"
+      MAX_UPLOAD_BYTES: "8388608"
+    ports:
+      - "8080:8080"
+    depends_on:
+      triton:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8080/health/ready')",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  prometheus:
+    image: prom/prometheus:v3.3.1
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./deploy/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      api:
+        condition: service_healthy

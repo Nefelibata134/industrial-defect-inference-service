@@ -1,0 +1,15 @@
+.git
+.github
+.pytest_cache
+.ruff_cache
+__pycache__
+*.pyc
+
+data
+models
+outputs
+model_repository/**/model.plan
+model_repository/**/artifact.json
+
+.env
+.venv

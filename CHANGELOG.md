@@ -22,11 +22,16 @@ linked to reproducible reports and immutable model artifacts.
 - ONNX graph inspection, structural validation, and dynamic-batch contract
   tests.
 - PyTorch-to-ONNX Runtime logit, mask, and metric parity report.
+- TensorRT FP32/FP16 engine build, numerical validation, and backend benchmark.
+- Versioned Triton model repository with artifact integrity metadata.
+- Dynamic batching for batches up to eight with preferred sizes four and eight.
+- FastAPI image validation, Triton HTTP inference, RLE response serialization,
+  health checks, and Prometheus metrics.
+- Docker Compose stack for Triton, the API gateway, and Prometheus.
+- Gateway, postprocessing, and model-repository contract tests.
 - CPU unit tests, Ruff checks, and GitHub Actions workflow.
 
 ### Planned
 
 - Frozen validation/test quality report for the promoted checkpoint.
-- TensorRT FP32/FP16 comparison.
-- Triton model repository and FastAPI gateway.
-- Docker Compose, observability, and load-test report.
+- Concurrent load-test report and final observability evidence.

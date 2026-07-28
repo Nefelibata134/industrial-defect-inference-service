@@ -30,6 +30,7 @@ runs/
 *.pt
 *.plan
 *.trt
+model_repository/**/artifact.json
 
 .idea/
 .vscode/

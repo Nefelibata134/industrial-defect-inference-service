@@ -1,0 +1,38 @@
+name: "steel_defect_segmentation"
+platform: "tensorrt_plan"
+default_model_filename: "model.plan"
+max_batch_size: 8
+
+input [
+  {
+    name: "images"
+    data_type: TYPE_FP32
+    dims: [3, 256, 1024]
+  }
+]
+
+output [
+  {
+    name: "logits"
+    data_type: TYPE_FP32
+    dims: [4, 256, 1024]
+  }
+]
+
+version_policy {
+  specific {
+    versions: 1
+  }
+}
+
+dynamic_batching {
+  preferred_batch_size: [4, 8]
+  max_queue_delay_microseconds: 2000
+}
+
+instance_group [
+  {
+    count: 1
+    kind: KIND_GPU
+  }
+]

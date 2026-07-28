@@ -88,14 +88,14 @@ serialization, and application-level errors. The boundary is documented in
 
 ## API Contract
 
-Planned stable endpoints:
+Implemented endpoints:
 
 | Method | Path | Purpose |
 | --- | --- | --- |
 | `GET` | `/health/live` | Process liveness |
 | `GET` | `/health/ready` | Gateway and model readiness |
+| `GET` | `/metrics` | Prometheus gateway metrics |
 | `POST` | `/v1/segment` | Segment defects in one image |
-| `POST` | `/v1/segment:batch` | Segment a bounded image batch |
 
 The response includes model version, per-class confidence, encoded masks,
 defect area, and request/inference timing. Invalid media types, oversized
@@ -336,6 +336,52 @@ capacity indicators, numerical tolerances, detailed percentiles, and
 environment limitations are in
 [TensorRT Build and Benchmark](docs/tensorrt-benchmark.md).
 
+## Triton Inference Service
+
+The FP16 plan is served by Triton `2.56.0` in the pinned
+`nvcr.io/nvidia/tritonserver:25.03-py3` container. Its TensorRT `10.9.0.34`
+runtime matches the engine build environment. The model repository accepts
+batches from `1` through `8`, prefers dynamic batches `4` and `8`, and permits
+up to `2 ms` of scheduler queueing.
+
+Prepare the model repository and start the complete stack:
+
+```bash
+python -m pip install -e ".[service,dev]"
+
+python scripts/prepare_triton_repository.py \
+  --engine models/unet_resnet18_severstal_fp16.plan
+
+docker compose up --build -d
+docker compose ps
+```
+
+Submit a validated Severstal image:
+
+```bash
+curl --fail \
+  -F image=@data/raw/severstal/train_images/0002cc93b.jpg \
+  "http://localhost:8080/v1/segment?threshold=0.80"
+
+python scripts/smoke_service.py \
+  --image data/raw/severstal/train_images/0002cc93b.jpg
+```
+
+Service endpoints:
+
+| Component | URL |
+| --- | --- |
+| Triton HTTP | `http://localhost:8000` |
+| Triton gRPC | `localhost:8001` |
+| Triton Prometheus metrics | `http://localhost:8002/metrics` |
+| FastAPI gateway | `http://localhost:8080` |
+| FastAPI OpenAPI | `http://localhost:8080/docs` |
+| Prometheus | `http://localhost:9090` |
+
+See [Triton Serving Stack](docs/serving.md) for the compatibility matrix,
+request data flow, dynamic-batching policy, observability, and failure
+contract.
+
 Resume an interrupted run from the latest completed epoch:
 
 ```bash
@@ -355,7 +401,9 @@ versioned quality report after the experiment is reproduced.
 ```text
 configs/                 Versioned experiment and service configuration
 data/                    Local datasets and generated manifests
+deploy/                  Gateway image and Prometheus configuration
 docs/                    Design, dataset, benchmark, and decision records
+model_repository/        Triton model configuration and local version artifacts
 models/                  Local checkpoints, ONNX files, and TensorRT engines
 outputs/                 Reports, visualizations, and load-test results
 scripts/                 Reproducible command-line entry points
@@ -395,7 +443,7 @@ thresholds, warmup, hardware state, and precision. The full protocol is in
 | `v0.1` | Data contract, validation report, deterministic split manifests |
 | `v0.2` | Reproducible PyTorch baseline and quality report |
 | `v0.3` | ONNX parity checks and TensorRT FP32/FP16 benchmarks |
-| `v0.4` | Triton model repository, FastAPI contract, and Docker Compose |
+| `v0.4` | Triton model repository, observable FastAPI gateway, Docker Compose |
 | `v1.0` | Load-test report, observability evidence, demo, and release artifacts |
 
 Progress is represented by versioned code, tests, benchmark artifacts, release
