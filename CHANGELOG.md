@@ -22,6 +22,7 @@ All notable changes to this repository are documented in this file.
   unavailable.
 - Unit, contract, deployment, and parity checks in the continuous integration
   workflow.
+- MIT License for project source code and documentation.
 
 ## Pre-1.0.0 Development Record
 

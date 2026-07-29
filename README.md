@@ -472,8 +472,10 @@ Release changes are recorded in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Licensing
 
+The source code and project documentation are available under the
+[MIT License](LICENSE).
+
 This repository does not redistribute the Severstal dataset, third-party model
 weights, CUDA, TensorRT, or Triton binaries. Dataset access remains subject to
 the Kaggle competition terms. Third-party dependency licenses apply
-independently. A project code license will be selected before the first public
-release.
+independently and are not replaced by the project license.
