@@ -382,6 +382,23 @@ See [Triton Serving Stack](docs/serving.md) for the compatibility matrix,
 request data flow, dynamic-batching policy, observability, and failure
 contract.
 
+Service load test on the RTX 4070 Laptop GPU:
+
+| Concurrency | Success | Errors | QPS | P50 ms | P95 ms | P99 ms |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 100 | 0 | 3.16 | 314.22 | 338.93 | 349.25 |
+| 2 | 100 | 0 | 3.56 | 553.04 | 594.27 | 603.99 |
+| 4 | 100 | 0 | 3.64 | 1080.18 | 1194.73 | 1220.48 |
+| 8 | 100 | 0 | 3.79 | 2095.35 | 2154.96 | 2198.43 |
+
+All 400 measured requests returned HTTP 200. Throughput saturated near
+3.8 QPS while queue and response latency continued to rise, so concurrency 1
+is recommended for latency-sensitive operation. The full method, dynamic
+batching comparison, metric caveats, and capacity recommendation are in
+[Service Load Test](docs/service-load-test.md). Machine-readable results are
+stored in
+[`outputs/reports/service_load_test.json`](outputs/reports/service_load_test.json).
+
 Resume an interrupted run from the latest completed epoch:
 
 ```bash
@@ -438,6 +455,8 @@ thresholds, warmup, hardware state, and precision. The full protocol is in
 
 ## Release Milestones
 
+Current release: `v1.0.0`.
+
 | Version | Deliverable |
 | --- | --- |
 | `v0.1` | Data contract, validation report, deterministic split manifests |
@@ -448,6 +467,8 @@ thresholds, warmup, hardware state, and precision. The full protocol is in
 
 Progress is represented by versioned code, tests, benchmark artifacts, release
 notes, and Git history. Results are added only after they are reproduced.
+
+Release changes are recorded in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Licensing
 

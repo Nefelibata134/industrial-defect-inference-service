@@ -24,6 +24,7 @@ class ServiceSettings:
     input_height: int = 256
     threshold: float = 0.80
     max_upload_bytes: int = 8 * 1024 * 1024
+    request_timeout_seconds: float = 5.0
 
     @classmethod
     def from_env(cls) -> ServiceSettings:
@@ -33,6 +34,9 @@ class ServiceSettings:
             model_version=os.getenv("TRITON_MODEL_VERSION", cls.model_version),
             threshold=float(os.getenv("SEGMENTATION_THRESHOLD", cls.threshold)),
             max_upload_bytes=int(os.getenv("MAX_UPLOAD_BYTES", cls.max_upload_bytes)),
+            request_timeout_seconds=float(
+                os.getenv("MODEL_REQUEST_TIMEOUT_SECONDS", cls.request_timeout_seconds)
+            ),
         )
 
     def __post_init__(self) -> None:
@@ -40,6 +44,8 @@ class ServiceSettings:
             raise ValueError("threshold must be between 0 and 1")
         if self.max_upload_bytes <= 0:
             raise ValueError("max_upload_bytes must be positive")
+        if self.request_timeout_seconds <= 0.0:
+            raise ValueError("request_timeout_seconds must be positive")
         dimensions = (
             self.source_width,
             self.source_height,
@@ -74,9 +80,7 @@ def decode_image(payload: bytes, settings: ServiceSettings) -> NDArray[np.uint8]
 
     expected_shape = (settings.source_height, settings.source_width, 3)
     if image.shape != expected_shape:
-        raise ValueError(
-            f"image must have shape {expected_shape}, got {image.shape}"
-        )
+        raise ValueError(f"image must have shape {expected_shape}, got {image.shape}")
     return image
 
 

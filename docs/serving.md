@@ -138,5 +138,23 @@ diagnosis.
 | Decode failure or dimensions other than `1600 x 256` | 422 |
 | Triton unavailable, model unavailable, or inference failure | 503 |
 
+Model readiness and inference calls have a five-second application deadline,
+configured through `MODEL_REQUEST_TIMEOUT_SECONDS`. Connection failures may
+return earlier. The deadline prevents unavailable model servers from holding
+gateway workers for the Triton client's longer transport timeout.
+
 CPU contract tests replace Triton with an asynchronous fake client. Container
 smoke tests exercise the real TensorRT plan and GPU runtime.
+
+## Recovery Verification
+
+The running stack was tested by stopping Triton while leaving the gateway
+available:
+
+| Check | Triton stopped | After Triton restart |
+| --- | --- | --- |
+| `GET /health/ready` | HTTP 503 in 1.18 s | HTTP 200 |
+| `POST /v1/segment` | HTTP 503 in 1.18 s | HTTP 200 |
+
+After recovery, the same Severstal image returned `defect_1` and `defect_3`,
+matching the pre-failure smoke response. No gateway restart was required.

@@ -27,6 +27,11 @@ def test_decode_image_rejects_unexpected_dimensions() -> None:
         decode_image(encode_image(100, 100), ServiceSettings())
 
 
+def test_service_settings_reject_non_positive_timeout() -> None:
+    with pytest.raises(ValueError, match="request_timeout_seconds must be positive"):
+        ServiceSettings(request_timeout_seconds=0.0)
+
+
 def test_serialize_segmentation_returns_per_class_rle() -> None:
     logits = np.full((1, 4, 2, 4), -10.0, dtype=np.float32)
     logits[0, 1, 0, 0:2] = 10.0
@@ -41,7 +46,5 @@ def test_serialize_segmentation_returns_per_class_rle() -> None:
     assert result[0]["detected"] is False
     assert result[1]["detected"] is True
     assert result[1]["defect_pixels"] == 2
-    assert result[1]["components"] == [
-        {"x": 0, "y": 0, "width": 2, "height": 1, "pixels": 2}
-    ]
+    assert result[1]["components"] == [{"x": 0, "y": 0, "width": 2, "height": 1, "pixels": 2}]
     assert result[1]["rle"] == "1 1 3 1"

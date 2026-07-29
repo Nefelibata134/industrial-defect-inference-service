@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from time import perf_counter
@@ -73,7 +74,7 @@ def create_app(
 
     app = FastAPI(
         title="Industrial Defect Inference Gateway",
-        version="0.4.0",
+        version="1.0.0",
         lifespan=lifespan,
     )
 
@@ -92,9 +93,7 @@ def create_app(
                 path,
                 str(status_code),
             ).inc()
-            metrics.request_duration.labels(request.method, path).observe(
-                perf_counter() - started
-            )
+            metrics.request_duration.labels(request.method, path).observe(perf_counter() - started)
 
     @app.get("/health/live")
     async def live() -> dict[str, str]:
@@ -103,7 +102,10 @@ def create_app(
     @app.get("/health/ready")
     async def ready(request: Request) -> dict[str, object]:
         try:
-            model_ready = await request.app.state.model_client.ready()
+            model_ready = await asyncio.wait_for(
+                request.app.state.model_client.ready(),
+                timeout=service_settings.request_timeout_seconds,
+            )
         except Exception as error:
             raise HTTPException(
                 status_code=503,
@@ -153,7 +155,10 @@ def create_app(
         preprocess_ms = (perf_counter() - preprocess_started) * 1000.0
 
         try:
-            logits, inference_ms = await request.app.state.model_client.infer(tensor)
+            logits, inference_ms = await asyncio.wait_for(
+                request.app.state.model_client.infer(tensor),
+                timeout=service_settings.request_timeout_seconds,
+            )
         except Exception as error:
             raise HTTPException(
                 status_code=503,

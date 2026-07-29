@@ -23,6 +23,7 @@ outputs/reports/*
 !outputs/reports/tensorrt_benchmark.json
 !outputs/reports/pytorch_cuda_benchmark.json
 !outputs/reports/onnxruntime_cuda_benchmark.json
+!outputs/reports/service_load_test.json
 runs/
 
 *.engine

@@ -1,9 +1,29 @@
 # Changelog
 
-All notable engineering changes are documented here. Performance claims are
-linked to reproducible reports and immutable model artifacts.
+All notable changes to this repository are documented in this file.
 
-## Unreleased
+## [1.0.0] - 2026-07-29
+
+### Added
+
+- Deterministic Severstal dataset validation and multilabel-aware manifests.
+- U-Net ResNet-18 training pipeline with mixed precision, checkpoint recovery,
+  class-aware sampling, and threshold analysis.
+- Per-class Dice, IoU, precision, recall, and image-level failure reports.
+- ONNX export with PyTorch and ONNX Runtime numerical parity checks.
+- TensorRT FP32 and FP16 engine builds, optimization profiles, runtime
+  validation, and backend benchmarks.
+- NVIDIA Triton model repository with dynamic batching.
+- FastAPI inference gateway with validation, mask encoding, Prometheus
+  metrics, and Docker Compose deployment.
+- Concurrent service load test with machine-readable results and capacity
+  recommendations.
+- Model-call deadlines and verified 503/recovery behavior when Triton is
+  unavailable.
+- Unit, contract, deployment, and parity checks in the continuous integration
+  workflow.
+
+## Pre-1.0.0 Development Record
 
 ### Added
 
@@ -31,7 +51,7 @@ linked to reproducible reports and immutable model artifacts.
 - Gateway, postprocessing, and model-repository contract tests.
 - CPU unit tests, Ruff checks, and GitHub Actions workflow.
 
-### Planned
+### Completed for 1.0.0
 
 - Frozen validation/test quality report for the promoted checkpoint.
 - Concurrent load-test report and final observability evidence.

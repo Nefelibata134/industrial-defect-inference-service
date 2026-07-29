@@ -1,0 +1,179 @@
+{
+  "created_at_utc": "2026-07-29T01:35:22.369438+00:00",
+  "endpoint": "http://localhost:8080/v1/segment",
+  "environment_proxy": "ignored by benchmark clients",
+  "image": "data/raw/severstal/train_images/0002cc93b.jpg",
+  "image_sha256": "dbfc6c8c3a382f438b73aa9f19a7f64081b5d43a42b9f1a6142ea244a07b8e37",
+  "model_name": "steel_defect_segmentation",
+  "model_version": "1",
+  "requests_per_level": 100,
+  "results": [
+    {
+      "client_latency": {
+        "max_ms": 369.8437059997559,
+        "mean_ms": 316.118389939993,
+        "min_ms": 294.63158799990197,
+        "p50_ms": 314.2229180000413,
+        "p95_ms": 338.92737720034347,
+        "p99_ms": 349.2511961499623
+      },
+      "concurrency": 1,
+      "elapsed_seconds": 31.620772032000332,
+      "error_rate": 0.0,
+      "failed_requests": 0,
+      "requests": 100,
+      "server_timing_mean_ms": {
+        "inference": 301.15534,
+        "postprocess": 4.63216,
+        "preprocess": 6.075889999999999,
+        "total": 312.09307
+      },
+      "status_counts": {
+        "200": 100
+      },
+      "successful_qps": 3.16247812984451,
+      "successful_requests": 100,
+      "triton_metrics": {
+        "average_batch_size": 1.0,
+        "compute_infer_ms_per_request": 2.24443,
+        "compute_input_ms_per_request": 0.00282,
+        "compute_output_ms_per_request": 1.58723,
+        "compute_total_ms_per_request": 3.8344799999999997,
+        "execution_count": 100.0,
+        "inference_count": 100.0,
+        "queue_ms_per_request": 2.14843,
+        "request_ms_per_request": 282.23342,
+        "successful_requests": 100.0
+      }
+    },
+    {
+      "client_latency": {
+        "max_ms": 618.5822869997537,
+        "mean_ms": 558.7479625399783,
+        "min_ms": 305.09786799984795,
+        "p50_ms": 553.0424234998463,
+        "p95_ms": 594.2744430999255,
+        "p99_ms": 603.9894672202037
+      },
+      "concurrency": 2,
+      "elapsed_seconds": 28.082973431000028,
+      "error_rate": 0.0,
+      "failed_requests": 0,
+      "requests": 100,
+      "server_timing_mean_ms": {
+        "inference": 544.20106,
+        "postprocess": 6.063019999999999,
+        "preprocess": 4.2861899999999995,
+        "total": 554.79217
+      },
+      "status_counts": {
+        "200": 100
+      },
+      "successful_qps": 3.5608764949943916,
+      "successful_requests": 100,
+      "triton_metrics": {
+        "average_batch_size": 1.0,
+        "compute_infer_ms_per_request": 256.47729,
+        "compute_input_ms_per_request": 0.00269,
+        "compute_output_ms_per_request": null,
+        "compute_total_ms_per_request": null,
+        "execution_count": 100.0,
+        "inference_count": 100.0,
+        "queue_ms_per_request": 2.15458,
+        "request_ms_per_request": 525.95715,
+        "successful_requests": 100.0
+      }
+    },
+    {
+      "client_latency": {
+        "max_ms": 1231.361477000064,
+        "mean_ms": 1082.4992341999903,
+        "min_ms": 322.0852139997987,
+        "p50_ms": 1080.178053500049,
+        "p95_ms": 1194.7312572000328,
+        "p99_ms": 1220.482657069815
+      },
+      "concurrency": 4,
+      "elapsed_seconds": 27.470007436000287,
+      "error_rate": 0.0,
+      "failed_requests": 0,
+      "requests": 100,
+      "server_timing_mean_ms": {
+        "inference": 1067.2413999999999,
+        "postprocess": 5.266799999999998,
+        "preprocess": 4.50011,
+        "total": 1077.2449599999998
+      },
+      "status_counts": {
+        "200": 100
+      },
+      "successful_qps": 3.640333925390458,
+      "successful_requests": 100,
+      "triton_metrics": {
+        "average_batch_size": 1.4285714285714286,
+        "compute_infer_ms_per_request": 374.72416,
+        "compute_input_ms_per_request": 0.00343,
+        "compute_output_ms_per_request": null,
+        "compute_total_ms_per_request": null,
+        "execution_count": 70.0,
+        "inference_count": 100.0,
+        "queue_ms_per_request": 337.75473,
+        "request_ms_per_request": 1130.61433,
+        "successful_requests": 100.0
+      }
+    },
+    {
+      "client_latency": {
+        "max_ms": 2217.786802000319,
+        "mean_ms": 2031.1360277000124,
+        "min_ms": 311.92908799994257,
+        "p50_ms": 2095.3516049999052,
+        "p95_ms": 2154.961070550212,
+        "p99_ms": 2198.432421789971
+      },
+      "concurrency": 8,
+      "elapsed_seconds": 26.371965075999924,
+      "error_rate": 0.0,
+      "failed_requests": 0,
+      "requests": 100,
+      "server_timing_mean_ms": {
+        "inference": 2015.20985,
+        "postprocess": 5.31906,
+        "preprocess": 3.9253900000000006,
+        "total": 2024.68232
+      },
+      "status_counts": {
+        "200": 100
+      },
+      "successful_qps": 3.7919055220881517,
+      "successful_requests": 100,
+      "triton_metrics": {
+        "average_batch_size": 3.0303030303030303,
+        "compute_infer_ms_per_request": 758.68459,
+        "compute_input_ms_per_request": 0.00387,
+        "compute_output_ms_per_request": null,
+        "compute_total_ms_per_request": null,
+        "execution_count": 33.0,
+        "inference_count": 100.0,
+        "queue_ms_per_request": 707.67098,
+        "request_ms_per_request": 2332.1632,
+        "successful_requests": 100.0
+      }
+    }
+  ],
+  "status": "pass",
+  "system": {
+    "gpu": {
+      "available": true,
+      "driver_version": "610.47",
+      "memory_total_mib": 8188,
+      "name": "NVIDIA GeForce RTX 4070 Laptop GPU"
+    },
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "python": "3.10.20"
+  },
+  "threshold": 0.8,
+  "timing_boundary": "client request serialization through complete JSON response transfer",
+  "triton_metrics_url": "http://localhost:8002/metrics",
+  "warmup_requests_per_level": 5
+}
