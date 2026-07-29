@@ -455,7 +455,7 @@ thresholds, warmup, hardware state, and precision. The full protocol is in
 
 ## Release Milestones
 
-Current release: `v1.0.0`.
+Current software version: `1.0.0`.
 
 | Version | Deliverable |
 | --- | --- |
